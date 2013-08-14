@@ -1,5 +1,20 @@
 {
+  "name": "command-palette",
+  "version": "0.0.0",
   "main": "./lib/command-palette-view",
   "description": "Find and run available commands.",
-  "activationEvents": "command-palette:toggle"
+  "activationEvents": "command-palette:toggle",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atom/command-palette.git"
+  },
+  "bugs": {
+    "url": "https://github.com/atom/command-palette/issues"
+  },
+  "engines": {
+    "atom": "*"
+  },
+  "publishConfig": {
+    "registry": "https://atom.iriscouch.com/registry/_design/app/_rewrite"
+  }
 }
