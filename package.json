@@ -1,6 +1,6 @@
 {
   "name": "command-palette",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "main": "./lib/command-palette-view",
   "description": "Find and run available commands.",
   "activationEvents": "command-palette:toggle",
