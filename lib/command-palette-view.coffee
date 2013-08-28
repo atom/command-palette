@@ -50,7 +50,7 @@ class CommandPaletteView extends SelectList
     $$ ->
       @li class: 'event', 'data-event-name': eventName, =>
         @span eventDescription, title: eventName
-        @div class: 'right', =>
+        @div class: 'pull-right', =>
           for binding in keyBindings[eventName] ? []
             @kbd binding, class: 'key-binding'
 
