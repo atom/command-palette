@@ -1,7 +1,5 @@
-RootView = require 'root-view'
-CommandPalette = require 'command-palette/lib/command-palette-view'
-$ = require 'jquery'
-_ = require 'underscore'
+{_, $, RootView} = require 'atom-api'
+CommandPalette = require '../lib/command-palette-view'
 
 describe "CommandPalette", ->
   [palette] = []
