@@ -1,4 +1,4 @@
-{_, $, RootView} = require 'atom-api'
+{_, $, RootView} = require 'atom'
 CommandPalette = require '../lib/command-palette-view'
 
 describe "CommandPalette", ->

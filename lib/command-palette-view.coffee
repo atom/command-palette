@@ -1,4 +1,4 @@
-{_, $, $$, SelectList} = require 'atom-api'
+{_, $, $$, SelectList} = require 'atom'
 
 module.exports =
 class CommandPaletteView extends SelectList
