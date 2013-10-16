@@ -6,7 +6,7 @@ describe "CommandPalette", ->
 
   beforeEach ->
     window.rootView = new RootView
-    rootView.open('sample.js')
+    rootView.openSync('sample.js')
     atom.activatePackage("command-palette")
     rootView.attachToDom().focus()
     rootView.trigger 'command-palette:toggle'
