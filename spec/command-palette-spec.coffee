@@ -96,3 +96,20 @@ describe "CommandPalette", ->
             expect(eventLi.find(".key-binding:contains(#{binding})")).toExist()
         else
           expect(eventLi).not.toExist()
+
+  describe "when the body has focus", ->
+    it "uses the root view as the element to display and trigger events for", ->
+      rootView.trigger 'command-palette:toggle'
+      $(document.body).focus()
+      rootView.trigger 'command-palette:toggle'
+      keyBindings = _.losslessInvert(keymap.bindingsForElement(rootView.getActiveView()))
+      for eventName, description of rootView.events()
+        eventLi = palette.list.children("[data-event-name='#{eventName}']")
+        if description
+          expect(eventLi).toExist()
+          expect(eventLi.find('span')).toHaveText(description)
+          expect(eventLi.find('span').attr('title')).toBe(eventName)
+          for binding in keyBindings[eventName] ? []
+            expect(eventLi.find(".key-binding:contains(#{binding})")).toExist()
+        else
+          expect(eventLi).not.toExist()

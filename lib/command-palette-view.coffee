@@ -26,7 +26,7 @@ class CommandPaletteView extends SelectList
   attach: ->
     super
 
-    if @previouslyFocusedElement[0]
+    if @previouslyFocusedElement[0] and @previouslyFocusedElement[0] isnt document.body
       @eventElement = @previouslyFocusedElement
     else
       @eventElement = rootView
