@@ -30,7 +30,7 @@ class CommandPaletteView extends SelectList
       @eventElement = @previouslyFocusedElement
     else
       @eventElement = rootView
-    @keyBindings = atom.keymap.bindingsMatchingElement(@eventElement)
+    @keyBindings = atom.keymap.keyBindingsMatchingElement(@eventElement)
 
     events = []
     for eventName, eventDescription of _.extend($(window).events(), @eventElement.events())
