@@ -17,15 +17,15 @@ describe "CommandPalette", ->
 
   describe "when command-palette:toggle is triggered on the root view", ->
     it "shows a list of all valid command descriptions, names, and keybindings for the previously focused element", ->
-      keyBindings = _.losslessInvert(keymap.bindingsForElement(rootView.getActiveView()))
+      keyBindings = atom.keymap.bindingsMatchingElement(rootView.getActiveView())
       for eventName, description of rootView.getActiveView().events()
         eventLi = palette.list.children("[data-event-name='#{eventName}']")
         if description
           expect(eventLi).toExist()
           expect(eventLi.find('span')).toHaveText(description)
           expect(eventLi.find('span').attr('title')).toBe(eventName)
-          for binding in keyBindings[eventName] ? []
-            expect(eventLi.find(".key-binding:contains(#{binding})")).toExist()
+          for binding in keyBindings when binding.command == eventName
+            expect(eventLi.find(".key-binding:contains(#{binding.keystroke})")).toExist()
         else
           expect(eventLi).not.toExist()
 
@@ -85,15 +85,15 @@ describe "CommandPalette", ->
       rootView.trigger 'command-palette:toggle'
       $(':focus').blur()
       rootView.trigger 'command-palette:toggle'
-      keyBindings = _.losslessInvert(keymap.bindingsForElement(rootView.getActiveView()))
+      keyBindings = atom.keymap.bindingsMatchingElement(rootView.getActiveView())
       for eventName, description of rootView.events()
         eventLi = palette.list.children("[data-event-name='#{eventName}']")
         if description
           expect(eventLi).toExist()
           expect(eventLi.find('span')).toHaveText(description)
           expect(eventLi.find('span').attr('title')).toBe(eventName)
-          for binding in keyBindings[eventName] ? []
-            expect(eventLi.find(".key-binding:contains(#{binding})")).toExist()
+          for binding in keyBindings when binding.command is eventName
+            expect(eventLi.find(".key-binding:contains(#{binding.keystroke})")).toExist()
         else
           expect(eventLi).not.toExist()
 
@@ -102,14 +102,14 @@ describe "CommandPalette", ->
       rootView.trigger 'command-palette:toggle'
       $(document.body).focus()
       rootView.trigger 'command-palette:toggle'
-      keyBindings = _.losslessInvert(keymap.bindingsForElement(rootView.getActiveView()))
+      keyBindings = atom.keymap.bindingsMatchingElement(rootView.getActiveView())
       for eventName, description of rootView.events()
         eventLi = palette.list.children("[data-event-name='#{eventName}']")
         if description
           expect(eventLi).toExist()
           expect(eventLi.find('span')).toHaveText(description)
           expect(eventLi.find('span').attr('title')).toBe(eventName)
-          for binding in keyBindings[eventName] ? []
-            expect(eventLi.find(".key-binding:contains(#{binding})")).toExist()
+          for binding in keyBindings when binding.command is eventName
+            expect(eventLi.find(".key-binding:contains(#{binding.keystroke})")).toExist()
         else
           expect(eventLi).not.toExist()
