@@ -5,20 +5,20 @@ describe "CommandPalette", ->
   [palette] = []
 
   beforeEach ->
-    window.rootView = new RootView
-    rootView.openSync('sample.js')
-    atom.activatePackage("command-palette")
-    rootView.attachToDom().focus()
-    rootView.trigger 'command-palette:toggle'
-    palette = rootView.find('.command-palette').view()
+    atom.rootView = new RootView
+    atom.rootView.openSync('sample.js')
+    atom.packages.activatePackage("command-palette")
+    atom.rootView.attachToDom().focus()
+    atom.rootView.trigger 'command-palette:toggle'
+    palette = atom.rootView.find('.command-palette').view()
 
   afterEach ->
-    rootView.remove()
+    atom.rootView.remove()
 
   describe "when command-palette:toggle is triggered on the root view", ->
     it "shows a list of all valid command descriptions, names, and keybindings for the previously focused element", ->
-      keyBindings = atom.keymap.keyBindingsMatchingElement(rootView.getActiveView())
-      for eventName, description of rootView.getActiveView().events()
+      keyBindings = atom.keymap.keyBindingsMatchingElement(atom.rootView.getActiveView())
+      for eventName, description of atom.rootView.getActiveView().events()
         eventLi = palette.list.children("[data-event-name='#{eventName}']")
         if description
           expect(eventLi).toExist()
@@ -30,7 +30,7 @@ describe "CommandPalette", ->
           expect(eventLi).not.toExist()
 
     it "displays all commands registerd on the window", ->
-      editorEvents = rootView.getActiveView().events()
+      editorEvents = atom.rootView.getActiveView().events()
       windowEvents = $(window).events()
       expect(_.isEmpty(windowEvents)).toBeFalsy()
       for eventName, description of windowEvents
@@ -50,7 +50,7 @@ describe "CommandPalette", ->
     it "clears the previous mini editor text", ->
       palette.miniEditor.setText('hello')
       palette.trigger 'command-palette:toggle'
-      rootView.trigger 'command-palette:toggle'
+      atom.rootView.trigger 'command-palette:toggle'
       expect(palette.miniEditor.getText()).toBe ''
 
   describe "when command-palette:toggle is triggered on the open command palette", ->
@@ -58,19 +58,19 @@ describe "CommandPalette", ->
       expect(palette.hasParent()).toBeTruthy()
       palette.trigger 'command-palette:toggle'
       expect(palette.hasParent()).toBeFalsy()
-      expect(rootView.getActiveView().isFocused).toBeTruthy()
+      expect(atom.rootView.getActiveView().isFocused).toBeTruthy()
 
   describe "when the command palette is cancelled", ->
     it "focuses the root view and detaches the command palette", ->
       expect(palette.hasParent()).toBeTruthy()
       palette.cancel()
       expect(palette.hasParent()).toBeFalsy()
-      expect(rootView.getActiveView().isFocused).toBeTruthy()
+      expect(atom.rootView.getActiveView().isFocused).toBeTruthy()
 
   describe "when an command selection is confirmed", ->
     it "detaches the palette, then focuses the previously focused element and emits the selected command on it", ->
       eventHandler = jasmine.createSpy 'eventHandler'
-      activeEditor = rootView.getActiveView()
+      activeEditor = atom.rootView.getActiveView()
       {eventName} = palette.array[5]
       activeEditor.preempt eventName, eventHandler
 
@@ -82,11 +82,11 @@ describe "CommandPalette", ->
 
   describe "when no element has focus", ->
     it "uses the root view as the element to display and trigger events for", ->
-      rootView.trigger 'command-palette:toggle'
+      atom.rootView.trigger 'command-palette:toggle'
       $(':focus').blur()
-      rootView.trigger 'command-palette:toggle'
-      keyBindings = atom.keymap.keyBindingsMatchingElement(rootView.getActiveView())
-      for eventName, description of rootView.events()
+      atom.rootView.trigger 'command-palette:toggle'
+      keyBindings = atom.keymap.keyBindingsMatchingElement(atom.rootView.getActiveView())
+      for eventName, description of atom.rootView.events()
         eventLi = palette.list.children("[data-event-name='#{eventName}']")
         if description
           expect(eventLi).toExist()
@@ -99,11 +99,11 @@ describe "CommandPalette", ->
 
   describe "when the body has focus", ->
     it "uses the root view as the element to display and trigger events for", ->
-      rootView.trigger 'command-palette:toggle'
+      atom.rootView.trigger 'command-palette:toggle'
       $(document.body).focus()
-      rootView.trigger 'command-palette:toggle'
-      keyBindings = atom.keymap.keyBindingsMatchingElement(rootView.getActiveView())
-      for eventName, description of rootView.events()
+      atom.rootView.trigger 'command-palette:toggle'
+      keyBindings = atom.keymap.keyBindingsMatchingElement(atom.rootView.getActiveView())
+      for eventName, description of atom.rootView.events()
         eventLi = palette.list.children("[data-event-name='#{eventName}']")
         if description
           expect(eventLi).toExist()
