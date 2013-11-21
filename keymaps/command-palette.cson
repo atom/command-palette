@@ -1,2 +1,5 @@
-'body, .command-palette .editor':
-  'meta-P': 'command-palette:toggle'
+'.platform-darwin, .platform-darwin .command-palette .editor':
+  'cmd-P': 'command-palette:toggle'
+
+'.platform-win32, .platform-win32 .command-palette .editor':
+  'ctrl-P': 'command-palette:toggle'
