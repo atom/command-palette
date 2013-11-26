@@ -15,7 +15,7 @@ class CommandPaletteView extends SelectList
   initialize: ->
     super
 
-    atom.rootView.command 'command-palette:toggle', => @toggle()
+    atom.workspaceView.command 'command-palette:toggle', => @toggle()
 
   toggle: ->
     if @hasParent()
@@ -29,7 +29,7 @@ class CommandPaletteView extends SelectList
     if @previouslyFocusedElement[0] and @previouslyFocusedElement[0] isnt document.body
       @eventElement = @previouslyFocusedElement
     else
-      @eventElement = atom.rootView
+      @eventElement = atom.workspaceView
     @keyBindings = atom.keymap.keyBindingsMatchingElement(@eventElement)
 
     events = []
@@ -39,7 +39,7 @@ class CommandPaletteView extends SelectList
     events = _.sortBy events, (e) -> e.eventDescription
 
     @setArray(events)
-    @appendTo(atom.rootView)
+    @appendTo(atom.workspaceView)
     @miniEditor.focus()
 
   itemForElement: ({eventName, eventDescription}) ->
