@@ -4,17 +4,8 @@
   "main": "./lib/command-palette-view",
   "description": "Find and run available commands.",
   "activationEvents": "command-palette:toggle",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/atom/command-palette.git"
-  },
-  "bugs": {
-    "url": "https://github.com/atom/command-palette/issues"
-  },
+  "repository": "https://github.com/atom/command-palette",
   "engines": {
     "atom": "*"
-  },
-  "publishConfig": {
-    "registry": "https://atom.cloudant.com/registry/_design/app/_rewrite"
   }
 }
