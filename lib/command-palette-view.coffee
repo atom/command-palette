@@ -46,10 +46,10 @@ class CommandPaletteView extends SelectList
     keyBindings = @keyBindings
     $$ ->
       @li class: 'event', 'data-event-name': eventName, =>
-        @span eventDescription, title: eventName
         @div class: 'pull-right', =>
           for binding in keyBindings when binding.command is eventName
-            @kbd binding.keystroke, class: 'key-binding'
+            @kbd _.humanizeKeystroke(binding.keystroke), class: 'key-binding'
+        @span eventDescription, title: eventName
 
   confirmed: ({eventName}) ->
     @cancel()
