@@ -25,7 +25,7 @@ describe "CommandPalette", ->
           expect(eventLi.find('span')).toHaveText(description)
           expect(eventLi.find('span').attr('title')).toBe(eventName)
           for binding in keyBindings when binding.command == eventName
-            expect(eventLi.find(".key-binding:contains(#{binding.keystroke})")).toExist()
+            expect(eventLi.find(".key-binding:contains(#{_.humanizeKeystroke(binding.keystroke)})")).toExist()
         else
           expect(eventLi).not.toExist()
 
@@ -93,7 +93,7 @@ describe "CommandPalette", ->
           expect(eventLi.find('span')).toHaveText(description)
           expect(eventLi.find('span').attr('title')).toBe(eventName)
           for binding in keyBindings when binding.command is eventName
-            expect(eventLi.find(".key-binding:contains(#{binding.keystroke})")).toExist()
+            expect(eventLi.find(".key-binding:contains(#{_.humanizeKeystroke(binding.keystroke)})")).toExist()
         else
           expect(eventLi).not.toExist()
 
@@ -110,6 +110,6 @@ describe "CommandPalette", ->
           expect(eventLi.find('span')).toHaveText(description)
           expect(eventLi.find('span').attr('title')).toBe(eventName)
           for binding in keyBindings when binding.command is eventName
-            expect(eventLi.find(".key-binding:contains(#{binding.keystroke})")).toExist()
+            expect(eventLi.find(".key-binding:contains(#{_.humanizeKeystroke(binding.keystroke)})")).toExist()
         else
           expect(eventLi).not.toExist()
