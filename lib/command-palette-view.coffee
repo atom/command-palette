@@ -1,7 +1,7 @@
-{_, $, $$, SelectList} = require 'atom'
+{_, $, $$, SelectListView} = require 'atom'
 
 module.exports =
-class CommandPaletteView extends SelectList
+class CommandPaletteView extends SelectListView
   @activate: ->
     new CommandPaletteView
 
