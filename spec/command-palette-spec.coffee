@@ -7,10 +7,17 @@ describe "CommandPalette", ->
   beforeEach ->
     atom.workspaceView = new WorkspaceView
     atom.workspaceView.openSync('sample.js')
-    atom.packages.activatePackage("command-palette")
+
+    activationPromise = atom.packages.activatePackage("command-palette")
+
     atom.workspaceView.attachToDom().focus()
     atom.workspaceView.trigger 'command-palette:toggle'
-    palette = atom.workspaceView.find('.command-palette').view()
+
+    waitsForPromise ->
+      activationPromise
+
+    runs ->
+      palette = atom.workspaceView.find('.command-palette').view()
 
   afterEach ->
     atom.workspaceView.remove()
