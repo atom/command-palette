@@ -5,17 +5,16 @@ class CommandPaletteView extends SelectListView
   @activate: ->
     new CommandPaletteView
 
-  @viewClass: ->
-    "#{super} command-palette overlay from-top"
-
-  filterKey: 'eventDescription'
-
   keyBindings: null
 
   initialize: ->
     super
 
+    @addClass('command-palette overlay from-top')
     atom.workspaceView.command 'command-palette:toggle', => @toggle()
+
+  getFilterKey: ->
+    'eventDescription'
 
   toggle: ->
     if @hasParent()
@@ -24,7 +23,7 @@ class CommandPaletteView extends SelectListView
       @attach()
 
   attach: ->
-    super
+    @storeFocusedElement()
 
     if @previouslyFocusedElement[0] and @previouslyFocusedElement[0] isnt document.body
       @eventElement = @previouslyFocusedElement
@@ -35,14 +34,13 @@ class CommandPaletteView extends SelectListView
     events = []
     for eventName, eventDescription of _.extend($(window).events(), @eventElement.events())
       events.push({eventName, eventDescription}) if eventDescription
+    events = _.sortBy(events, 'eventDescription')
+    @setItems(events)
 
-    events = _.sortBy events, (e) -> e.eventDescription
+    atom.workspaceView.append(this)
+    @focusFilterEditor()
 
-    @setArray(events)
-    @appendTo(atom.workspaceView)
-    @miniEditor.focus()
-
-  itemForElement: ({eventName, eventDescription}) ->
+  viewForItem: ({eventName, eventDescription}) ->
     keyBindings = @keyBindings
     $$ ->
       @li class: 'event', 'data-event-name': eventName, =>

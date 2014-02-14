@@ -26,7 +26,7 @@ describe "CommandPalette", ->
     it "shows a list of all valid command descriptions, names, and keybindings for the previously focused element", ->
       keyBindings = atom.keymap.keyBindingsMatchingElement(atom.workspaceView.getActiveView())
       for eventName, description of atom.workspaceView.getActiveView().events()
-        eventLi = palette.list.children("[data-event-name='#{eventName}']")
+        eventLi = palette.find("[data-event-name='#{eventName}']")
         if description
           expect(eventLi).toExist()
           expect(eventLi.find('span')).toHaveText(description)
@@ -51,14 +51,14 @@ describe "CommandPalette", ->
           expect(eventLi).not.toExist()
 
     it "focuses the mini-editor and selects the first command", ->
-      expect(palette.miniEditor.isFocused).toBeTruthy()
+      expect(palette.filterEditorView.isFocused).toBeTruthy()
       expect(palette.find('.event:first')).toHaveClass 'selected'
 
     it "clears the previous mini editor text", ->
-      palette.miniEditor.setText('hello')
+      palette.filterEditorView.setText('hello')
       palette.trigger 'command-palette:toggle'
       atom.workspaceView.trigger 'command-palette:toggle'
-      expect(palette.miniEditor.getText()).toBe ''
+      expect(palette.filterEditorView.getText()).toBe ''
 
   describe "when command-palette:toggle is triggered on the open command palette", ->
     it "focus the root view and detaches the command palette", ->
@@ -78,10 +78,10 @@ describe "CommandPalette", ->
     it "detaches the palette, then focuses the previously focused element and emits the selected command on it", ->
       eventHandler = jasmine.createSpy 'eventHandler'
       activeEditor = atom.workspaceView.getActiveView()
-      {eventName} = palette.array[5]
+      {eventName} = palette.items[5]
       activeEditor.preempt eventName, eventHandler
 
-      palette.confirmed(palette.array[5])
+      palette.confirmed(palette.items[5])
 
       expect(activeEditor.isFocused).toBeTruthy()
       expect(eventHandler).toHaveBeenCalled()
