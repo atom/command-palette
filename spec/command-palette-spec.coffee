@@ -1,4 +1,5 @@
-{_, $, WorkspaceView} = require 'atom'
+_ = require 'underscore-plus'
+{$, WorkspaceView} = require 'atom'
 CommandPalette = require '../lib/command-palette-view'
 
 describe "CommandPalette", ->

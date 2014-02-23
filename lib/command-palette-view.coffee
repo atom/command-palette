@@ -1,4 +1,5 @@
-{_, $, $$, SelectListView} = require 'atom'
+_ = require 'underscore-plus'
+{$, $$, SelectListView} = require 'atom'
 
 module.exports =
 class CommandPaletteView extends SelectListView
