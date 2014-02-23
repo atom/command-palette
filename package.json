@@ -5,6 +5,7 @@
   "description": "Find and run available commands.",
   "activationEvents": "command-palette:toggle",
   "repository": "https://github.com/atom/command-palette",
+  "license": "MIT",
   "engines": {
     "atom": "*"
   }
