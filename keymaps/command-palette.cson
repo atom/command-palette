@@ -1,5 +1,5 @@
 '.platform-darwin, .platform-darwin .command-palette .editor':
-  'cmd-P': 'command-palette:toggle'
+  'cmd-shift-p': 'command-palette:toggle'
 
 '.platform-win32, .platform-win32 .command-palette .editor':
-  'ctrl-P': 'command-palette:toggle'
+  'ctrl-shift-p': 'command-palette:toggle'
