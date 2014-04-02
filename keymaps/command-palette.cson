@@ -3,3 +3,6 @@
 
 '.platform-win32, .platform-win32 .command-palette .editor':
   'ctrl-shift-p': 'command-palette:toggle'
+
+'.platform-linux, .platform-linux .command-palette .editor':
+  'ctrl-shift-p': 'command-palette:toggle'
