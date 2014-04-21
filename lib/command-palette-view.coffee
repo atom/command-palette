@@ -30,7 +30,7 @@ class CommandPaletteView extends SelectListView
       @eventElement = @previouslyFocusedElement
     else
       @eventElement = atom.workspaceView
-    @keyBindings = atom.keymap.keyBindingsMatchingElement(@eventElement)
+    @keyBindings = atom.keymap.findKeyBindings(target: @eventElement[0])
 
     events = []
     for eventName, eventDescription of _.extend($(window).events(), @eventElement.events())
@@ -47,7 +47,7 @@ class CommandPaletteView extends SelectListView
       @li class: 'event', 'data-event-name': eventName, =>
         @div class: 'pull-right', =>
           for binding in keyBindings when binding.command is eventName
-            @kbd _.humanizeKeystroke(binding.keystroke), class: 'key-binding'
+            @kbd _.humanizeKeystroke(binding.keystrokes), class: 'key-binding'
         @span eventDescription, title: eventName
 
   confirmed: ({eventName}) ->
