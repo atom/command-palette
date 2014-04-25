@@ -1,4 +1,4 @@
-# Command Palette package
+# Command Palette package [![Build Status](https://travis-ci.org/atom/command-palette.svg?branch=master)](https://travis-ci.org/atom/command-palette)
 
 Find and run available commands using `cmd-shift-p` in Atom.
 
