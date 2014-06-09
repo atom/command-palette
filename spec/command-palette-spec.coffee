@@ -77,7 +77,7 @@ describe "CommandPalette", ->
 
   describe "when an command selection is confirmed", ->
     it "detaches the palette, then focuses the previously focused element and emits the selected command on it", ->
-      eventHandler = jasmine.createSpy 'eventHandler'
+      eventHandler = jasmine.createSpy('eventHandler').andReturn(false)
       activeEditor = atom.workspaceView.getActiveView()
       {eventName} = palette.items[5]
       activeEditor.preempt eventName, eventHandler
