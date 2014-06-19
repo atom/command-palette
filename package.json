@@ -1,6 +1,6 @@
 {
   "name": "command-palette",
-  "version": "0.22.0",
+  "version": "0.23.0",
   "main": "./lib/command-palette-view",
   "description": "Find and run available commands using `cmd-shift-p`.",
   "activationEvents": "command-palette:toggle",
