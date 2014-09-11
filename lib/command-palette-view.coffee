@@ -15,7 +15,7 @@ class CommandPaletteView extends SelectListView
     atom.workspaceView.command 'command-palette:toggle', => @toggle()
 
   getFilterKey: ->
-    'eventDescription'
+    'displayName'
 
   toggle: ->
     if @hasParent()
@@ -32,24 +32,31 @@ class CommandPaletteView extends SelectListView
       @eventElement = atom.workspaceView
     @keyBindings = atom.keymap.findKeyBindings(target: @eventElement[0])
 
-    events = []
-    for eventName, eventDescription of _.extend($(window).events(), @eventElement.events())
-      events.push({eventName, eventDescription}) if eventDescription
-    events = _.sortBy(events, 'eventDescription')
-    @setItems(events)
+    if atom.commands?
+      commands = atom.commands.findCommands(target: @eventElement[0])
+    else
+      commands = []
+      for eventName, eventDescription of _.extend($(window).events(), @eventElement.events())
+        commands.push({name: eventName, displayName: eventDescription, jQuery: true}) if eventDescription
+
+    commands = _.sortBy(commands, 'displayName')
+    @setItems(commands)
 
     atom.workspaceView.append(this)
     @focusFilterEditor()
 
-  viewForItem: ({eventName, eventDescription}) ->
+  viewForItem: ({name, displayName}) ->
     keyBindings = @keyBindings
     $$ ->
-      @li class: 'event', 'data-event-name': eventName, =>
+      @li class: 'event', 'data-event-name': name, =>
         @div class: 'pull-right', =>
-          for binding in keyBindings when binding.command is eventName
+          for binding in keyBindings when binding.command is name
             @kbd _.humanizeKeystroke(binding.keystrokes), class: 'key-binding'
-        @span eventDescription, title: eventName
+        @span displayName, title: name
 
-  confirmed: ({eventName}) ->
+  confirmed: ({name, jQuery}) ->
     @cancel()
-    @eventElement.trigger(eventName)
+    if jQuery
+      @eventElement.trigger name
+    else
+      @eventElement[0].dispatchEvent(new CustomEvent(name))
