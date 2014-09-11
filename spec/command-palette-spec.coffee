@@ -30,18 +30,23 @@ describe "CommandPalette", ->
   describe "when command-palette:toggle is triggered on the root view", ->
     it "shows a list of all valid command descriptions, names, and keybindings for the previously focused element", ->
       keyBindings = atom.keymap.findKeyBindings(atom.workspaceView.getActiveView())
-      for eventName, description of atom.workspaceView.getActiveView().events()
-        eventLi = palette.find("[data-event-name='#{eventName}']")
-        if description
-          expect(eventLi).toExist()
-          expect(eventLi.find('span')).toHaveText(description)
-          expect(eventLi.find('span').attr('title')).toBe(eventName)
-          for binding in keyBindings when binding.command == eventName
-            expect(eventLi.find(".key-binding:contains(#{_.humanizeKeystroke(binding.keystrokes)})")).toExist()
-        else
-          expect(eventLi).not.toExist()
 
-    it "displays all commands registerd on the window", ->
+      if atom.commands?
+        commands = atom.commands.findCommands(target: atom.workspaceView.getActiveView()[0])
+      else
+        commands = []
+        for eventName, description of atom.workspaceView.getActiveView().events() when description
+          commands.push(name: eventName, displayName: description)
+
+      for {name, displayName} in commands
+        eventLi = palette.find("[data-event-name='#{name}']")
+        expect(eventLi).toExist()
+        expect(eventLi.find('span')).toHaveText(displayName)
+        expect(eventLi.find('span').attr('title')).toBe(name)
+        for binding in keyBindings when binding.command == name
+          expect(eventLi.find(".key-binding:contains(#{_.humanizeKeystroke(binding.keystrokes)})")).toExist()
+
+    it "displays all commands registered on the window", ->
       editorEvents = atom.workspaceView.getActiveView().events()
       windowEvents = $(window).events()
       expect(_.isEmpty(windowEvents)).toBeFalsy()
@@ -83,7 +88,8 @@ describe "CommandPalette", ->
     it "detaches the palette, then focuses the previously focused element and emits the selected command on it", ->
       eventHandler = jasmine.createSpy('eventHandler').andReturn(false)
       activeEditor = atom.workspaceView.getActiveView()
-      {eventName} = palette.items[5]
+      eventName = palette.items[5].eventName ? palette.items[5].name
+
       activeEditor.preempt eventName, eventHandler
 
       palette.confirmed(palette.items[5])

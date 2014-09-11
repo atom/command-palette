@@ -37,7 +37,7 @@ class CommandPaletteView extends SelectListView
     else
       commands = []
       for eventName, eventDescription of _.extend($(window).events(), @eventElement.events())
-        commands.push({name: eventName, displayName: eventDescription}) if eventDescription
+        commands.push({name: eventName, displayName: eventDescription, jQuery: true}) if eventDescription
 
     commands = _.sortBy(commands, 'displayName')
     @setItems(commands)
@@ -54,6 +54,9 @@ class CommandPaletteView extends SelectListView
             @kbd _.humanizeKeystroke(binding.keystrokes), class: 'key-binding'
         @span displayName, title: name
 
-  confirmed: ({name}) ->
+  confirmed: ({name, jQuery}) ->
     @cancel()
-    @eventElement[0].dispatchEvent(new CustomEvent(name))
+    if jQuery
+      @eventElement.trigger name
+    else
+      @eventElement[0].dispatchEvent(new CustomEvent(name))
