@@ -103,17 +103,15 @@ describe "CommandPalette", ->
       atom.workspaceView.trigger 'command-palette:toggle'
       $(':focus').blur()
       atom.workspaceView.trigger 'command-palette:toggle'
+
       keyBindings = atom.keymap.findKeyBindings(atom.workspaceView.getActiveView())
-      for eventName, description of atom.workspaceView.events()
-        eventLi = palette.list.children("[data-event-name='#{eventName}']")
-        if description
-          expect(eventLi).toExist()
-          expect(eventLi.find('span')).toHaveText(description)
-          expect(eventLi.find('span').attr('title')).toBe(eventName)
-          for binding in keyBindings when binding.command is eventName
-            expect(eventLi.find(".key-binding:contains(#{_.humanizeKeystroke(binding.keystrokes)})")).toExist()
-        else
-          expect(eventLi).not.toExist()
+      for {name, displayName} in atom.commands.findCommands(target: atom.workspaceView[0])
+        eventLi = palette.list.children("[data-event-name='#{name}']")
+        expect(eventLi).toExist()
+        expect(eventLi.find('span')).toHaveText(displayName)
+        expect(eventLi.find('span').attr('title')).toBe(name)
+        for binding in keyBindings when binding.command is eventName
+          expect(eventLi.find(".key-binding:contains(#{_.humanizeKeystroke(binding.keystrokes)})")).toExist()
 
   describe "when the body has focus", ->
     it "uses the root view as the element to display and trigger events for", ->
@@ -121,13 +119,10 @@ describe "CommandPalette", ->
       $(document.body).focus()
       atom.workspaceView.trigger 'command-palette:toggle'
       keyBindings = atom.keymap.findKeyBindings(atom.workspaceView.getActiveView())
-      for eventName, description of atom.workspaceView.events()
-        eventLi = palette.list.children("[data-event-name='#{eventName}']")
-        if description
-          expect(eventLi).toExist()
-          expect(eventLi.find('span')).toHaveText(description)
-          expect(eventLi.find('span').attr('title')).toBe(eventName)
-          for binding in keyBindings when binding.command is eventName
-            expect(eventLi.find(".key-binding:contains(#{_.humanizeKeystroke(binding.keystrokes)})")).toExist()
-        else
-          expect(eventLi).not.toExist()
+      for {name, displayName} in atom.commands.findCommands(target: atom.workspaceView[0])
+        eventLi = palette.list.children("[data-event-name='#{name}']")
+        expect(eventLi).toExist()
+        expect(eventLi.find('span')).toHaveText(displayName)
+        expect(eventLi.find('span').attr('title')).toBe(name)
+        for binding in keyBindings when binding.command is eventName
+          expect(eventLi.find(".key-binding:contains(#{_.humanizeKeystroke(binding.keystrokes)})")).toExist()
