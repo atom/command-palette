@@ -59,4 +59,4 @@ class CommandPaletteView extends SelectListView
     if jQuery
       @eventElement.trigger name
     else
-      @eventElement[0].dispatchEvent(new CustomEvent(name))
+      @eventElement[0].dispatchEvent(new CustomEvent(name, bubbles: true, cancelable: true))
