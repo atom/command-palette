@@ -88,11 +88,11 @@ describe "CommandPalette", ->
     it "detaches the palette, then focuses the previously focused element and emits the selected command on it", ->
       eventHandler = jasmine.createSpy('eventHandler').andReturn(false)
       activeEditor = atom.workspaceView.getActiveView()
-      eventName = palette.items[5].eventName ? palette.items[5].name
+      eventName = palette.items[3].name
 
       activeEditor.preempt eventName, eventHandler
 
-      palette.confirmed(palette.items[5])
+      palette.confirmed(palette.items[3])
 
       expect(activeEditor.isFocused).toBeTruthy()
       expect(eventHandler).toHaveBeenCalled()
