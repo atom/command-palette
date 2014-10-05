@@ -2,7 +2,7 @@
   "name": "command-palette",
   "version": "0.27.0",
   "main": "./lib/command-palette-view",
-  "description": "Find and run available commands using `cmd-shift-p`(OSX) or `ctrl-shift-p`(Linux/Wndows).",
+  "description": "Find and run available commands using `cmd-shift-p`(OSX) or `ctrl-shift-p`(Linux/Windows).",
   "activationEvents": "command-palette:toggle",
   "repository": "https://github.com/atom/command-palette",
   "license": "MIT",
