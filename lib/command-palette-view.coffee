@@ -18,15 +18,13 @@ class CommandPaletteView extends SelectListView
   getFilterKey: ->
     'displayName'
 
+  cancelled: -> @hide()
+
   toggle: ->
     if @panel?.isVisible()
       @cancel()
     else
       @show()
-
-  detach: ->
-    # dont actually want to detach. @cancel() calls this.
-    @hide()
 
   show: ->
     @panel ?= atom.workspace.addModalPanel(item: this)
