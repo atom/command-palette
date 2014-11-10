@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "space-pen": "^3.8.1",
-    "atom-space-pen-views": "^0.14.0",
+    "atom-space-pen-views": "^0.15.0",
     "underscore-plus": "1.x"
   }
 }
