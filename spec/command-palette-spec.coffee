@@ -61,7 +61,7 @@ describe "CommandPalette", ->
           expect(eventLi).not.toExist()
 
     it "focuses the mini-editor and selects the first command", ->
-      expect(palette.filterEditorView.isFocused).toBeTruthy()
+      expect(palette.filterEditorView.hasFocus()).toBeTruthy()
       expect(palette.find('.event:first')).toHaveClass 'selected'
 
     it "clears the previous mini editor text", ->
@@ -71,21 +71,21 @@ describe "CommandPalette", ->
       expect(palette.filterEditorView.getText()).toBe ''
 
   describe "when command-palette:toggle is triggered on the open command palette", ->
-    it "focus the root view and detaches the command palette", ->
-      expect(palette.hasParent()).toBeTruthy()
-      palette.trigger 'command-palette:toggle'
-      expect(palette.hasParent()).toBeFalsy()
+    it "focus the root view and hides the command palette", ->
+      expect(palette.isVisible()).toBeTruthy()
+      atom.commands.dispatch palette[0], 'command-palette:toggle'
+      expect(palette.is(':visible')).toBeFalsy()
       expect(atom.workspaceView.getActiveView().isFocused).toBeTruthy()
 
   describe "when the command palette is cancelled", ->
-    it "focuses the root view and detaches the command palette", ->
-      expect(palette.hasParent()).toBeTruthy()
+    it "focuses the root view and hides the command palette", ->
+      expect(palette.is(':visible')).toBeTruthy()
       palette.cancel()
-      expect(palette.hasParent()).toBeFalsy()
+      expect(palette.is(':visible')).toBeFalsy()
       expect(atom.workspaceView.getActiveView().isFocused).toBeTruthy()
 
   describe "when an command selection is confirmed", ->
-    it "detaches the palette, then focuses the previously focused element and emits the selected command on it", ->
+    it "hides the palette, then focuses the previously focused element and emits the selected command on it", ->
       eventHandler = jasmine.createSpy('eventHandler').andReturn(false)
       activeEditor = atom.workspaceView.getActiveView()
       eventName = palette.items[3].name
@@ -96,7 +96,7 @@ describe "CommandPalette", ->
 
       expect(activeEditor.isFocused).toBeTruthy()
       expect(eventHandler).toHaveBeenCalled()
-      expect(palette.hasParent()).toBeFalsy()
+      expect(palette.is(':visible')).toBeFalsy()
 
   describe "when no element has focus", ->
     it "uses the root view as the element to display and trigger events for", ->

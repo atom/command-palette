@@ -1,5 +1,6 @@
 _ = require 'underscore-plus'
-{$, $$, SelectListView} = require 'atom'
+{$, $$} = require 'space-pen'
+{SelectListView} = require 'atom-space-pen-views'
 
 module.exports =
 class CommandPaletteView extends SelectListView
@@ -11,19 +12,24 @@ class CommandPaletteView extends SelectListView
   initialize: ->
     super
 
-    @addClass('command-palette overlay from-top')
+    @addClass('command-palette')
     atom.workspaceView.command 'command-palette:toggle', => @toggle()
 
   getFilterKey: ->
     'displayName'
 
+  cancelled: -> @hide()
+
   toggle: ->
-    if @hasParent()
+    if @panel?.isVisible()
       @cancel()
     else
-      @attach()
+      @show()
 
-  attach: ->
+  show: ->
+    @panel ?= atom.workspace.addModalPanel(item: this)
+    @panel.show()
+
     @storeFocusedElement()
 
     if @previouslyFocusedElement[0] and @previouslyFocusedElement[0] isnt document.body
@@ -42,10 +48,12 @@ class CommandPaletteView extends SelectListView
     commands = _.sortBy(commands, 'displayName')
     @setItems(commands)
 
-    atom.workspaceView.append(this)
     @focusFilterEditor()
 
-  viewForItem: ({name, displayName}) ->
+  hide: ->
+    @panel?.hide()
+
+  viewForItem: ({name, displayName, eventDescription}) ->
     keyBindings = @keyBindings
     $$ ->
       @li class: 'event', 'data-event-name': name, =>
