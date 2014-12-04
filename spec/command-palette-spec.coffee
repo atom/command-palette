@@ -1,5 +1,5 @@
 _ = require 'underscore-plus'
-{$, WorkspaceView} = require 'atom'
+{WorkspaceView} = require 'atom'
 CommandPalette = require '../lib/command-palette-view'
 
 describe "CommandPalette", ->
@@ -46,20 +46,6 @@ describe "CommandPalette", ->
         for binding in keyBindings when binding.command == name
           expect(eventLi.find(".key-binding:contains(#{_.humanizeKeystroke(binding.keystrokes)})")).toExist()
 
-    it "displays all commands registered on the window", ->
-      editorEvents = atom.workspaceView.getActiveView().events()
-      windowEvents = $(window).events()
-      expect(_.isEmpty(windowEvents)).toBeFalsy()
-      for eventName, description of windowEvents
-        eventLi = palette.list.children("[data-event-name='#{eventName}']")
-        description = editorEvents[eventName] unless description
-        if description
-          expect(eventLi).toExist()
-          expect(eventLi.find('span')).toHaveText(description)
-          expect(eventLi.find('span').attr('title')).toBe(eventName)
-        else
-          expect(eventLi).not.toExist()
-
     it "focuses the mini-editor and selects the first command", ->
       expect(palette.filterEditorView.hasFocus()).toBeTruthy()
       expect(palette.find('.event:first')).toHaveClass 'selected'
@@ -101,7 +87,7 @@ describe "CommandPalette", ->
   describe "when no element has focus", ->
     it "uses the root view as the element to display and trigger events for", ->
       atom.workspaceView.trigger 'command-palette:toggle'
-      $(':focus').blur()
+      document.activeElement.blur()
       atom.workspaceView.trigger 'command-palette:toggle'
 
       keyBindings = atom.keymap.findKeyBindings(atom.workspaceView.getActiveView())
@@ -116,7 +102,7 @@ describe "CommandPalette", ->
   describe "when the body has focus", ->
     it "uses the root view as the element to display and trigger events for", ->
       atom.workspaceView.trigger 'command-palette:toggle'
-      $(document.body).focus()
+      document.body.focus()
       atom.workspaceView.trigger 'command-palette:toggle'
       keyBindings = atom.keymap.findKeyBindings(atom.workspaceView.getActiveView())
       for {name, displayName} in atom.commands.findCommands(target: atom.workspaceView[0])
