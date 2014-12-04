@@ -25,18 +25,21 @@ describe "CommandPalette", ->
     runs ->
       palette = $(workspaceElement.querySelector('.command-palette')).view()
 
+  expectCommandsForElement = (element) ->
+    keyBindings = atom.keymap.findKeyBindings(target: element)
+    for {name, displayName} in atom.commands.findCommands(target: element)
+      eventLi = palette.list.children("[data-event-name='#{name}']")
+      expect(eventLi).toExist()
+      expect(eventLi.find('span')).toHaveText(displayName)
+      expect(eventLi.find('span').attr('title')).toBe(name)
+      for binding in keyBindings when binding.command is name
+        expect(eventLi.text()).toContain(_.humanizeKeystroke(binding.keystrokes))
+
   describe "when command-palette:toggle is triggered on the root view", ->
     it "shows a list of all valid command descriptions, names, and keybindings for the previously focused element", ->
       keyBindings = atom.keymap.findKeyBindings(target: editorElement)
       commands = atom.commands.findCommands(target: editorElement)
-
-      for {name, displayName} in commands
-        eventLi = palette.find("[data-event-name='#{name}']")
-        expect(eventLi).toExist()
-        expect(eventLi.find('span')).toHaveText(displayName)
-        expect(eventLi.find('span').attr('title')).toBe(name)
-        for binding in keyBindings when binding.command is name
-          expect(eventLi.find(".key-binding:contains(#{_.humanizeKeystroke(binding.keystrokes)})")).toExist()
+      expectCommandsForElement(editorElement)
 
     it "focuses the mini-editor and selects the first command", ->
       expect(palette.filterEditorView.hasFocus()).toBeTruthy()
@@ -79,26 +82,11 @@ describe "CommandPalette", ->
       atom.commands.dispatch(workspaceElement, 'command-palette:toggle')
       document.activeElement.blur()
       atom.commands.dispatch(workspaceElement, 'command-palette:toggle')
-
-      keyBindings = atom.keymap.findKeyBindings(target: workspaceElement)
-      for {name, displayName} in atom.commands.findCommands(target: workspaceElement)
-        eventLi = palette.list.children("[data-event-name='#{name}']")
-        expect(eventLi).toExist()
-        expect(eventLi.find('span')).toHaveText(displayName)
-        expect(eventLi.find('span').attr('title')).toBe(name)
-        for binding in keyBindings when binding.command is name
-          expect(eventLi.text()).toContain(_.humanizeKeystroke(binding.keystrokes))
+      expectCommandsForElement(workspaceElement)
 
   describe "when the body has focus", ->
     it "uses the root view as the element to display and trigger events for", ->
       atom.commands.dispatch(workspaceElement, 'command-palette:toggle')
       document.body.focus()
       atom.commands.dispatch(workspaceElement, 'command-palette:toggle')
-      keyBindings = atom.keymap.findKeyBindings(target: workspaceElement)
-      for {name, displayName} in atom.commands.findCommands(target: workspaceElement)
-        eventLi = palette.list.children("[data-event-name='#{name}']")
-        expect(eventLi).toExist()
-        expect(eventLi.find('span')).toHaveText(displayName)
-        expect(eventLi.find('span').attr('title')).toBe(name)
-        for binding in keyBindings when binding.command is name
-          expect(eventLi.find(".key-binding:contains(#{_.humanizeKeystroke(binding.keystrokes)})")).toExist()
+      expectCommandsForElement(workspaceElement)
