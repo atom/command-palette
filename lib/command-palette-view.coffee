@@ -4,7 +4,11 @@ _ = require 'underscore-plus'
 module.exports =
 class CommandPaletteView extends SelectListView
   @activate: ->
-    new CommandPaletteView
+    view = new CommandPaletteView
+    @disposable = atom.commands.add 'atom-workspace', 'command-palette:toggle', -> view.toggle()
+
+  @deactivate: ->
+    @disposable.dispose()
 
   keyBindings: null
 
@@ -12,7 +16,6 @@ class CommandPaletteView extends SelectListView
     super
 
     @addClass('command-palette')
-    atom.workspaceView.command 'command-palette:toggle', => @toggle()
 
   getFilterKey: ->
     'displayName'
@@ -32,18 +35,12 @@ class CommandPaletteView extends SelectListView
     @storeFocusedElement()
 
     if @previouslyFocusedElement[0] and @previouslyFocusedElement[0] isnt document.body
-      @eventElement = @previouslyFocusedElement
+      @eventElement = @previouslyFocusedElement[0]
     else
-      @eventElement = atom.workspaceView
-    @keyBindings = atom.keymap.findKeyBindings(target: @eventElement[0])
+      @eventElement = atom.views.getView(atom.workspace)
+    @keyBindings = atom.keymap.findKeyBindings(target: @eventElement)
 
-    if atom.commands?
-      commands = atom.commands.findCommands(target: @eventElement[0])
-    else
-      commands = []
-      for eventName, eventDescription of _.extend($(window).events(), @eventElement.events())
-        commands.push({name: eventName, displayName: eventDescription, jQuery: true}) if eventDescription
-
+    commands = atom.commands.findCommands(target: @eventElement)
     commands = _.sortBy(commands, 'displayName')
     @setItems(commands)
 
@@ -61,9 +58,6 @@ class CommandPaletteView extends SelectListView
             @kbd _.humanizeKeystroke(binding.keystrokes), class: 'key-binding'
         @span displayName, title: name
 
-  confirmed: ({name, jQuery}) ->
+  confirmed: ({name}) ->
     @cancel()
-    if jQuery
-      @eventElement.trigger name
-    else
-      @eventElement[0].dispatchEvent(new CustomEvent(name, bubbles: true, cancelable: true))
+    @eventElement.dispatchEvent(new CustomEvent(name, bubbles: true, cancelable: true))
