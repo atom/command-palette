@@ -10,7 +10,7 @@ describe "CommandPalette", ->
     activationPromise = null
 
     waitsForPromise ->
-      atom.workspace.open('sample.js')
+      atom.workspace.open()
 
     runs ->
       editorElement = atom.views.getView(atom.workspace.getActiveTextEditor())
