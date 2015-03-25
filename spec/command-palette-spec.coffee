@@ -26,7 +26,7 @@ describe "CommandPalette", ->
       palette = $(workspaceElement.querySelector('.command-palette')).view()
 
   expectCommandsForElement = (element) ->
-    keyBindings = atom.keymap.findKeyBindings(target: element)
+    keyBindings = atom.keymaps.findKeyBindings(target: element)
     for {name, displayName} in atom.commands.findCommands(target: element)
       eventLi = palette.list.children("[data-event-name='#{name}']")
       expect(eventLi).toExist()
@@ -37,7 +37,7 @@ describe "CommandPalette", ->
 
   describe "when command-palette:toggle is triggered on the root view", ->
     it "shows a list of all valid command descriptions, names, and keybindings for the previously focused element", ->
-      keyBindings = atom.keymap.findKeyBindings(target: editorElement)
+      keyBindings = atom.keymaps.findKeyBindings(target: editorElement)
       commands = atom.commands.findCommands(target: editorElement)
       expectCommandsForElement(editorElement)
 

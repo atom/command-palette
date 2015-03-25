@@ -38,7 +38,7 @@ class CommandPaletteView extends SelectListView
       @eventElement = @previouslyFocusedElement[0]
     else
       @eventElement = atom.views.getView(atom.workspace)
-    @keyBindings = atom.keymap.findKeyBindings(target: @eventElement)
+    @keyBindings = atom.keymaps.findKeyBindings(target: @eventElement)
 
     commands = atom.commands.findCommands(target: @eventElement)
     commands = _.sortBy(commands, 'displayName')
