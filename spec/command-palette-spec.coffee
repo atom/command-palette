@@ -30,8 +30,10 @@ describe "CommandPalette", ->
     for {name, displayName} in atom.commands.findCommands(target: element)
       eventLi = palette.list.children("[data-event-name='#{name}']")
       expect(eventLi).toExist()
-      expect(eventLi.find('span')).toHaveText(displayName)
-      expect(eventLi.find('span').attr('title')).toBe(name)
+      expect(eventLi.find('.primary-line')).toHaveText(displayName)
+      expect(eventLi.find('.primary-line').attr('title')).toBe(name)
+      expect(eventLi.find('.secondary-line')).toHaveText(name)
+      expect(eventLi.find('.secondary-line').attr('title')).toBe(name)
       for binding in keyBindings when binding.command is name
         expect(eventLi.text()).toContain(_.humanizeKeystroke(binding.keystrokes))
 
