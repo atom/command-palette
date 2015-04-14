@@ -52,11 +52,12 @@ class CommandPaletteView extends SelectListView
   viewForItem: ({name, displayName, eventDescription}) ->
     keyBindings = @keyBindings
     $$ ->
-      @li class: 'event', 'data-event-name': name, =>
+      @li class: 'event two-lines', 'data-event-name': name, =>
         @div class: 'pull-right', =>
           for binding in keyBindings when binding.command is name
             @kbd _.humanizeKeystroke(binding.keystrokes), class: 'key-binding'
-        @span displayName, title: name
+        @div displayName, class: 'primary-line', title: name
+        @div name, class: 'secondary-line', title: name
 
   confirmed: ({name}) ->
     @cancel()
