@@ -113,7 +113,7 @@ describe "CommandPalette", ->
       expect(matches.length).toBe 1
       expect(matches.last().text()).toBe 'Application'
 
-    it "highlights multiple matches in the file name", ->
+    it "highlights multiple matches in the command name", ->
       palette.filterEditorView.getModel().setText('ApplicationAbout')
       palette.populateList()
       resultView = palette.getSelectedItemView()
