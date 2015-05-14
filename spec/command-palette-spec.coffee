@@ -90,3 +90,35 @@ describe "CommandPalette", ->
       document.body.focus()
       atom.commands.dispatch(workspaceElement, 'command-palette:toggle')
       expectCommandsForElement(workspaceElement)
+
+  describe "match highlighting", ->
+    beforeEach ->
+      jasmine.attachToDOM(workspaceElement)
+
+    it "highlights an exact match", ->
+      palette.filterEditorView.getModel().setText('Application: About')
+      palette.populateList()
+      resultView = palette.getSelectedItemView()
+
+      matches = resultView.find('.character-match')
+      expect(matches.length).toBe 1
+      expect(matches.last().text()).toBe 'Application: About'
+
+    it "highlights a partial match", ->
+      palette.filterEditorView.getModel().setText('Application')
+      palette.populateList()
+      resultView = palette.getSelectedItemView()
+
+      matches = resultView.find('.character-match')
+      expect(matches.length).toBe 1
+      expect(matches.last().text()).toBe 'Application'
+
+    it "highlights multiple matches in the file name", ->
+      palette.filterEditorView.getModel().setText('ApplicationAbout')
+      palette.populateList()
+      resultView = palette.getSelectedItemView()
+
+      matches = resultView.find('.character-match')
+      expect(matches.length).toBe 2
+      expect(matches.first().text()).toBe 'Application'
+      expect(matches.last().text()).toBe 'About'
