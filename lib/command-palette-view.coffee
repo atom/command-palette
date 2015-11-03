@@ -1,15 +1,24 @@
 _ = require 'underscore-plus'
 {SelectListView, $, $$} = require 'atom-space-pen-views'
 {match} = require 'fuzzaldrin'
+fuzzaldrinPlus = require 'fuzzaldrin-plus'
 
 module.exports =
 class CommandPaletteView extends SelectListView
+
+  @config:
+    useAlternateScoring:
+      type: 'boolean'
+      default: false
+      description: 'Use an alternative scoring approach which prefers run of consecutive characters, acronyms and start of words. (Experimental)'
+
   @activate: ->
     view = new CommandPaletteView
     @disposable = atom.commands.add 'atom-workspace', 'command-palette:toggle', -> view.toggle()
 
   @deactivate: ->
     @disposable.dispose()
+    @scoreSubscription?.dispose()
 
   keyBindings: null
 
@@ -17,6 +26,8 @@ class CommandPaletteView extends SelectListView
     super
 
     @addClass('command-palette')
+    @alternateScoring = atom.config.get 'command-palette.useAlternateScoring'
+    @scoreSubscription = atom.config.onDidChange 'command-palette.useAlternateScoring', ({newValue}) => @alternateScoring = newValue
 
   getFilterKey: ->
     'displayName'
@@ -54,7 +65,10 @@ class CommandPaletteView extends SelectListView
     keyBindings = @keyBindings
     # Style matched characters in search results
     filterQuery = @getFilterQuery()
-    matches = match(displayName, filterQuery)
+    if @alternateScoring
+      matches = fuzzaldrinPlus.match(displayName, filterQuery)
+    else
+      matches = match(displayName, filterQuery)
 
     $$ ->
       highlighter = (command, matches, offsetIndex) =>
@@ -86,3 +100,35 @@ class CommandPaletteView extends SelectListView
   confirmed: ({name}) ->
     @cancel()
     @eventElement.dispatchEvent(new CustomEvent(name, bubbles: true, cancelable: true))
+
+  populateList: ->
+    if @alternateScoring
+      @populateAlternateList()
+    else
+      super
+
+  # This is modified copy/paste from SelectListView#populateList, require jQuery!
+  # Should be temporary
+  populateAlternateList: ->
+
+    return unless @items?
+
+    filterQuery = @getFilterQuery()
+    if filterQuery.length
+      filteredItems = fuzzaldrinPlus.filter(@items, filterQuery, key: @getFilterKey())
+    else
+      filteredItems = @items
+
+    @list.empty()
+    if filteredItems.length
+      @setError(null)
+
+      for i in [0...Math.min(filteredItems.length, @maxItems)]
+        item = filteredItems[i]
+        itemView = $(@viewForItem(item))
+        itemView.data('select-list-item', item)
+        @list.append(itemView)
+
+      @selectItemView(@list.find('li:first'))
+    else
+      @setError(@getEmptyMessage(@items.length, filteredItems.length))
