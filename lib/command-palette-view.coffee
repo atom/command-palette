@@ -9,7 +9,7 @@ class CommandPaletteView extends SelectListView
   @config:
     useAlternateScoring:
       type: 'boolean'
-      default: false
+      default: true
       description: 'Use an alternative scoring approach which prefers run of consecutive characters, acronyms and start of words. (Experimental)'
 
   @activate: ->
