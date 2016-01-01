@@ -1,10 +1,14 @@
+###* @babel ###
+###* @jsx etch.dom ###
+
 _ = require 'underscore-plus'
-{SelectListView, $, $$} = require 'atom-space-pen-views'
+# {SelectListView, $, $$} = require 'atom-space-pen-views'
 {match} = require 'fuzzaldrin'
 fuzzaldrinPlus = require 'fuzzaldrin-plus'
+SelectListComponent = require '/Users/kuychaco/github/select-list-component/src/select-list-component'
 
 module.exports =
-class CommandPaletteView extends SelectListView
+class CommandPalette
 
   @config:
     useAlternateScoring:
@@ -13,8 +17,23 @@ class CommandPaletteView extends SelectListView
       description: 'Use an alternative scoring approach which prefers run of consecutive characters, acronyms and start of words. (Experimental)'
 
   @activate: ->
-    view = new CommandPaletteView
-    @disposable = atom.commands.add 'atom-workspace', 'command-palette:toggle', -> view.toggle()
+    delegate =
+      getItems: => @items || []
+      cancelled: => @hide()
+      confirmed: (item) => @confirmed(item)
+      getItem: => @getItem()
+      elementForItem: ({name, displayName, eventDescription}) =>
+        keystrokes = _.humanizeKeystroke(@keyBindingMap.get(name)?.keystrokes)
+        @element = document.createElement('div')
+        @element.innerHTML = '
+          <div class="pull-right"></div>
+          <span title=' + name + '>' + displayName + '</span>'
+        if keystrokes?
+          @element.getElementsByClassName('pull-right')[0].innerHTML = '<kbd class="key-binding">' + keystrokes + '</kbd>'
+        @element
+
+    @component = new SelectListComponent(delegate)
+    @disposable = atom.commands.add 'atom-workspace', 'command-palette:toggle', => @toggle()
 
   @deactivate: ->
     @disposable.dispose()
@@ -32,33 +51,35 @@ class CommandPaletteView extends SelectListView
   getFilterKey: ->
     'displayName'
 
-  cancelled: -> @hide()
 
-  toggle: ->
+  @toggle: ->
     if @panel?.isVisible()
-      @cancel()
+      @component.cancel()
     else
       @show()
 
-  show: ->
-    @panel ?= atom.workspace.addModalPanel(item: this)
-    @panel.show()
+  @show: ->
+    @component.storeFocusedElement()
 
-    @storeFocusedElement()
-
-    if @previouslyFocusedElement[0] and @previouslyFocusedElement[0] isnt document.body
-      @eventElement = @previouslyFocusedElement[0]
+    if @previouslyFocusedElement and @previouslyFocusedElement isnt document.body
+      @eventElement = @previouslyFocusedElement
     else
       @eventElement = atom.views.getView(atom.workspace)
-    @keyBindings = atom.keymaps.findKeyBindings(target: @eventElement)
+    keyBindings = atom.keymaps.findKeyBindings(target: @eventElement)
+    @keyBindingMap = new Map()
+    @keyBindingMap.set(binding.command, binding) for binding in keyBindings
 
     commands = atom.commands.findCommands(target: @eventElement)
     commands = _.sortBy(commands, 'displayName')
-    @setItems(commands)
+    @items = commands
 
-    @focusFilterEditor()
+    @panel ?= atom.workspace.addModalPanel(item: @component.element)
+    @component.populate()
+    @panel.show()
 
-  hide: ->
+    @component.focusFilterEditor()
+
+  @hide: ->
     @panel?.hide()
 
   viewForItem: ({name, displayName, eventDescription}) ->
@@ -97,8 +118,8 @@ class CommandPaletteView extends SelectListView
             @kbd _.humanizeKeystroke(binding.keystrokes), class: 'key-binding'
         @span title: name, -> highlighter(displayName, matches, 0)
 
-  confirmed: ({name}) ->
-    @cancel()
+  @confirmed: ({name}) ->
+    @component.cancel()
     @eventElement.dispatchEvent(new CustomEvent(name, bubbles: true, cancelable: true))
 
   populateList: ->
