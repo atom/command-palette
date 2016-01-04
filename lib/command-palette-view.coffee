@@ -22,6 +22,7 @@ class CommandPalette
       cancelled: => @hide()
       confirmed: (item) => @confirmed(item)
       getItem: => @getItem()
+      getFilterKey: -> 'displayName'
       elementForItem: ({name, displayName, eventDescription}) =>
         keystrokes = _.humanizeKeystroke(@keyBindingMap.get(name)?.keystrokes)
         @element = document.createElement('div')
@@ -41,15 +42,14 @@ class CommandPalette
 
   keyBindings: null
 
-  initialize: ->
-    super
+  # initialize: ->
+  #   super
+  #
+  #   @addClass('command-palette')
+  #   @alternateScoring = atom.config.get 'command-palette.useAlternateScoring'
+  #   @scoreSubscription = atom.config.onDidChange 'command-palette.useAlternateScoring', ({newValue}) => @alternateScoring = newValue
 
-    @addClass('command-palette')
-    @alternateScoring = atom.config.get 'command-palette.useAlternateScoring'
-    @scoreSubscription = atom.config.onDidChange 'command-palette.useAlternateScoring', ({newValue}) => @alternateScoring = newValue
 
-  getFilterKey: ->
-    'displayName'
 
 
   @toggle: ->
