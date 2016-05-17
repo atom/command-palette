@@ -50,6 +50,14 @@ describe "CommandPalette", ->
       atom.commands.dispatch(workspaceElement, 'command-palette:toggle')
       expect(palette.filterEditorView.getText()).toBe ''
 
+  describe "when command-palette:toggle is triggered and the preserveLastSearch setting is enabled", ->
+    it "preserves the previous mini editor text", ->
+      atom.config.set('command-palette.preserveLastSearch', true)
+      palette.filterEditorView.setText('hello')
+      palette.cancel()
+      atom.commands.dispatch(workspaceElement, 'command-palette:toggle')
+      expect(palette.filterEditorView.getText()).toBe 'hello'
+
   describe "when command-palette:toggle is triggered on the open command palette", ->
     it "focus the root view and hides the command palette", ->
       expect(palette.isVisible()).toBeTruthy()
