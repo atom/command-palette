@@ -10,7 +10,7 @@ class CommandPaletteView extends SelectListView
     useAlternateScoring:
       type: 'boolean'
       default: true
-      description: 'Use an alternative scoring approach which prefers run of consecutive characters, acronyms and start of words. (Experimental)'
+      description: 'Use an alternative scoring approach which prefers run of consecutive characters, acronyms and start of words.'
 
   @activate: ->
     view = new CommandPaletteView
