@@ -1,7 +1,7 @@
 {
   "name": "command-palette",
   "version": "0.38.0",
-  "main": "./lib/command-palette-view",
+  "main": "./lib/main",
   "description": "Find and run available commands using `cmd-shift-p` (macOS) or `ctrl-shift-p` (Linux/Windows).",
   "activationCommands": {
     "atom-workspace": [
@@ -15,11 +15,36 @@
   },
   "dependencies": {
     "atom-space-pen-views": "^2.0.0",
+    "etch": "^0.6.2",
     "fuzzaldrin": "^2.1.0",
     "fuzzaldrin-plus": "^0.1.0",
     "underscore-plus": "^1.0.0"
   },
   "devDependencies": {
-    "coffeelint": "^1.9.7"
+    "babel-eslint": "^6.1.2",
+    "coffeelint": "^1.9.7",
+    "standard": "^7.1.2"
+  },
+  "standard": {
+    "ignore": [],
+    "parser": "babel-eslint",
+    "globals": [
+      "atom",
+      "afterEach",
+      "beforeEach",
+      "describe",
+      "fdescribe",
+      "xdescribe",
+      "expect",
+      "it",
+      "fit",
+      "xit",
+      "jasmine",
+      "runs",
+      "spyOn",
+      "waits",
+      "waitsFor",
+      "waitsForPromise"
+    ]
   }
 }
