@@ -11,6 +11,10 @@ class CommandPaletteView extends SelectListView
       type: 'boolean'
       default: true
       description: 'Use an alternative scoring approach which prefers run of consecutive characters, acronyms and start of words.'
+    preserveLastSearch:
+      type: 'boolean'
+      default: false
+      description: 'Preserve the last search when reopening the command palette.'
 
   @activate: ->
     view = new CommandPaletteView
@@ -19,6 +23,7 @@ class CommandPaletteView extends SelectListView
   @deactivate: ->
     @disposable.dispose()
     @scoreSubscription?.dispose()
+    @preserveLastSearchSubscription?.dispose()
 
   keyBindings: null
 
@@ -26,11 +31,20 @@ class CommandPaletteView extends SelectListView
     super
 
     @addClass('command-palette')
+
     @alternateScoring = atom.config.get 'command-palette.useAlternateScoring'
     @scoreSubscription = atom.config.onDidChange 'command-palette.useAlternateScoring', ({newValue}) => @alternateScoring = newValue
 
+    @preserveLastSearch = atom.config.get 'command-palette.preserveLastSearch'
+    preserveLastSearchSubscription = atom.config.onDidChange 'command-palette.preserveLastSearch', ({newValue}) => @preserveLastSearch = newValue
+    @lastSearch = ''
+
   getFilterKey: ->
     'displayName'
+
+  cancel: ->
+    @lastSearch = @getFilterQuery()
+    super
 
   cancelled: -> @hide()
 
@@ -41,6 +55,10 @@ class CommandPaletteView extends SelectListView
       @show()
 
   show: ->
+    if @preserveLastSearch
+      @filterEditorView.setText(@lastSearch)
+      @filterEditorView.getModel().selectAll()
+
     @panel ?= atom.workspace.addModalPanel(item: this)
     @panel.show()
 
