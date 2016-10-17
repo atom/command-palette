@@ -63,14 +63,14 @@ describe "CommandPalette", ->
       expect(palette.isVisible()).toBeTruthy()
       atom.commands.dispatch palette[0], 'command-palette:toggle'
       expect(palette.is(':visible')).toBeFalsy()
-      expect(document.activeElement).toBe(editorElement)
+      expect(document.activeElement.closest('atom-text-editor')).toBe(editorElement)
 
   describe "when the command palette is cancelled", ->
     it "focuses the root view and hides the command palette", ->
       expect(palette.is(':visible')).toBeTruthy()
       palette.cancel()
       expect(palette.is(':visible')).toBeFalsy()
-      expect(document.activeElement).toBe(editorElement)
+      expect(document.activeElement.closest('atom-text-editor')).toBe(editorElement)
 
   describe "when an command selection is confirmed", ->
     it "hides the palette, then focuses the previously focused element and emits the selected command on it", ->
@@ -81,7 +81,7 @@ describe "CommandPalette", ->
 
       palette.confirmed(palette.items[3])
 
-      expect(document.activeElement).toBe(editorElement)
+      expect(document.activeElement.closest('atom-text-editor')).toBe(editorElement)
       expect(eventHandler).toHaveBeenCalled()
       expect(palette.is(':visible')).toBeFalsy()
 
