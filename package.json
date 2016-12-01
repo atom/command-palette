@@ -21,5 +21,17 @@
   },
   "devDependencies": {
     "coffeelint": "^1.9.7"
+  },
+  "configSchema": {
+    "useAlternateScoring": {
+      "type": "boolean",
+      "default": true,
+      "description": "Use an alternative scoring approach which prefers run of consecutive characters, acronyms and start of words."
+    },
+    "preserveLastSearch": {
+      "type": "boolean",
+      "default": false,
+      "description": "Preserve the last search when reopening the command palette."
+    }
   }
 }

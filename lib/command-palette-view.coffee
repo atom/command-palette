@@ -5,17 +5,6 @@ fuzzaldrinPlus = require 'fuzzaldrin-plus'
 
 module.exports =
 class CommandPaletteView extends SelectListView
-
-  @config:
-    useAlternateScoring:
-      type: 'boolean'
-      default: true
-      description: 'Use an alternative scoring approach which prefers run of consecutive characters, acronyms and start of words.'
-    preserveLastSearch:
-      type: 'boolean'
-      default: false
-      description: 'Preserve the last search when reopening the command palette.'
-
   @activate: ->
     view = new CommandPaletteView
     @disposable = atom.commands.add 'atom-workspace', 'command-palette:toggle', -> view.toggle()
