@@ -59,7 +59,7 @@ describe "CommandPalette", ->
       expect(palette.filterEditorView.getText()).toBe 'hello'
 
   describe "when command-palette:toggle is triggered on the open command palette", ->
-    it "focus the root view and hides the command palette", ->
+    it "focuses the root view and hides the command palette", ->
       expect(palette.isVisible()).toBeTruthy()
       atom.commands.dispatch palette[0], 'command-palette:toggle'
       expect(palette.is(':visible')).toBeFalsy()
