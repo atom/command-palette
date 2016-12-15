@@ -1,6 +1,6 @@
 {
   "name": "command-palette",
-  "version": "0.39.1",
+  "version": "0.39.2",
   "main": "./lib/command-palette-package",
   "description": "Find and run available commands using `cmd-shift-p` (macOS) or `ctrl-shift-p` (Linux/Windows).",
   "activationCommands": {
@@ -17,7 +17,7 @@
   "dependencies": {
     "atom-select-list": "0.0.5",
     "fuzzaldrin": "^2.1.0",
-    "fuzzaldrin-plus": "^0.1.0",
+    "fuzzaldrin-plus": "^0.4.1",
     "underscore-plus": "^1.0.0"
   },
   "devDependencies": {
