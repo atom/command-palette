@@ -21,8 +21,7 @@
     "underscore-plus": "^1.0.0"
   },
   "devDependencies": {
-    "atom-mocha-test-runner": "^0.3.0",
-    "coffeelint": "^1.9.7"
+    "atom-mocha-test-runner": "^0.3.0"
   },
   "configSchema": {
     "useAlternateScoring": {
