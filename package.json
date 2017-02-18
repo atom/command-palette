@@ -13,6 +13,9 @@
   "engines": {
     "atom": "*"
   },
+  "scripts": {
+    "test": "standard lib/**/*.js test/**/*.js && atom --test test/*.test.js"
+  },
   "atomTestRunner": "atom-mocha-test-runner",
   "dependencies": {
     "atom-select-list": "0.0.5",
@@ -21,7 +24,8 @@
     "underscore-plus": "^1.0.0"
   },
   "devDependencies": {
-    "atom-mocha-test-runner": "^0.3.0"
+    "atom-mocha-test-runner": "^0.3.0",
+    "standard": "^8.6.0"
   },
   "configSchema": {
     "useAlternateScoring": {
@@ -34,5 +38,10 @@
       "default": false,
       "description": "Preserve the last search when reopening the command palette."
     }
+  },
+  "standard": {
+    "globals": [
+      "atom"
+    ]
   }
 }
