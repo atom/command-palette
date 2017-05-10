@@ -36,10 +36,10 @@
       "description": "Preserve the last search when reopening the command palette."
     },
     "maxResults": {
-      "default": 100000,
+      "type": "integer",
+      "default": 10,
       "minimum": 1,
-      "description": "Number of items",
-      "type": "integer"
+      "description": "Number of items to appears on select-list"
     }
   }
 }
