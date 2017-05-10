@@ -125,10 +125,9 @@ describe('CommandPaletteView', () => {
 
     it("Limit items added to select-list with specified `maxResults` value", async () => {
       const commandPalette = new CommandPaletteView()
+      await commandPalette.toggle()
       await commandPalette.update({maxResults: 5})
-      await commandPalette.toggle()
       assert.equal(commandPalette.selectListView.items.length, 5)
-      await commandPalette.toggle()
       await commandPalette.update({maxResults: 1})
       assert.equal(commandPalette.selectListView.items.length, 1)
     })
