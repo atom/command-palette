@@ -16,12 +16,12 @@ describe('CommandPaletteView', () => {
         'foo:with-description': {
           displayName: 'A Custom Display Name',
           description: 'Awesome description here',
-          onDidDispatch() {}
+          onDidDispatch () {}
         },
         'foo:with-tags': {
           displayName: 'A Custom Display Name',
           tags: ['bar', 'baz'],
-          onDidDispatch() {}
+          onDidDispatch () {}
         }
       }
     )
@@ -50,13 +50,17 @@ describe('CommandPaletteView', () => {
 
         const keyBindings = atom.keymaps.findKeyBindings({target: editor.element})
         for (const item of atom.commands.findCommands({target: editor.element})) {
-          const {name, description, displayName, tags} = item;
+          const {name, description, displayName, tags} = item
           const eventLi = workspaceElement.querySelector(`[data-event-name='${name}']`)
-          const displayNameLine = eventLi.querySelector('.primary-line');
+          const displayNameLine = eventLi.querySelector('.primary-line')
           assert.equal(displayNameLine.textContent, displayName)
           assert.equal(displayNameLine.title, name)
 
           if (description) {
+            // just in case it's not the first, need to select the item in order
+            // for its description to show
+            await commandPalette.selectListView.selectItem(item)
+
             const descriptionEl = eventLi.querySelector('.secondary-line div')
             assert(descriptionEl)
             assert.equal(descriptionEl.textContent, description)
@@ -172,7 +176,7 @@ describe('CommandPaletteView', () => {
   })
 
   describe('match highlighting', () => {
-    it("highlights exact matches", async () => {
+    it('highlights exact matches', async () => {
       const commandPalette = new CommandPaletteView()
       await commandPalette.toggle()
       commandPalette.selectListView.refs.queryEditor.setText('Application: About')
@@ -182,7 +186,7 @@ describe('CommandPaletteView', () => {
       assert.equal(matches[0].textContent, 'Application: About')
     })
 
-    it("highlights partial matches in the displayName", async () => {
+    it('highlights partial matches in the displayName', async () => {
       const commandPalette = new CommandPaletteView()
       await commandPalette.toggle()
       commandPalette.selectListView.refs.queryEditor.setText('Application')
@@ -194,12 +198,12 @@ describe('CommandPaletteView', () => {
       }
     })
 
-    it("highlights partial matches in the description", async () => {
+    it('highlights partial matches in the description', async () => {
       const commandPalette = new CommandPaletteView()
       await commandPalette.toggle()
       commandPalette.selectListView.refs.queryEditor.setText('Awesome')
       await commandPalette.selectListView.update()
-      const {element} = commandPalette.selectListView;
+      const {element} = commandPalette.selectListView
 
       const withDescriptionLi = element.querySelector(`[data-event-name='foo:with-description']`)
       const matches = withDescriptionLi.querySelectorAll('.character-match')
@@ -207,12 +211,12 @@ describe('CommandPaletteView', () => {
       assert.equal(matches[0].textContent, 'Awesome')
     })
 
-    it("highlights partial matches in the tags", async () => {
+    it('highlights partial matches in the tags', async () => {
       const commandPalette = new CommandPaletteView()
       await commandPalette.toggle()
       commandPalette.selectListView.refs.queryEditor.setText('bar')
       await commandPalette.selectListView.update()
-      const {element} = commandPalette.selectListView;
+      const {element} = commandPalette.selectListView
 
       const withTagsLi = element.querySelector(`[data-event-name='foo:with-tags']`)
       const matches = withTagsLi.querySelectorAll('.character-match')
@@ -220,7 +224,7 @@ describe('CommandPaletteView', () => {
       assert.equal(matches[0].textContent, 'bar')
     })
 
-    it("highlights multiple matches in the command name", async () => {
+    it('highlights multiple matches in the command name', async () => {
       const commandPalette = new CommandPaletteView()
       await commandPalette.toggle()
       commandPalette.selectListView.refs.queryEditor.setText('ApplicationAbout')
