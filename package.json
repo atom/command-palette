@@ -15,14 +15,15 @@
   },
   "atomTestRunner": "atom-mocha-test-runner",
   "dependencies": {
-    "atom-select-list": "^0.1.0",
+    "atom-select-list": "github:atom/atom-select-list#073f0955d51b568baa7191a89a9d0b1979a039ac",
     "fuzzaldrin": "^2.1.0",
     "fuzzaldrin-plus": "^0.4.1",
     "underscore-plus": "^1.0.0"
   },
   "devDependencies": {
     "atom-mocha-test-runner": "^0.3.0",
-    "coffeelint": "^1.9.7"
+    "coffeelint": "^1.9.7",
+    "sinon": "^3.2.1"
   },
   "configSchema": {
     "useAlternateScoring": {
