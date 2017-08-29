@@ -2,30 +2,13 @@
 
 import _ from 'underscore-plus'
 import assert from 'assert'
+import semver from 'semver'
 import sinon from 'sinon'
 import CommandPaletteView from '../lib/command-palette-view'
 
 describe('CommandPaletteView', () => {
   let sandbox
   let workspaceElement
-
-  before(() => {
-    atom.commands.add(
-      '*',
-      {
-        'foo:with-description': {
-          displayName: 'A Custom Display Name',
-          description: 'Awesome description here',
-          onDidDispatch () {}
-        },
-        'foo:with-tags': {
-          displayName: 'A Custom Display Name',
-          tags: ['bar', 'baz'],
-          onDidDispatch () {}
-        }
-      }
-    )
-  })
 
   beforeEach(() => {
     workspaceElement = atom.views.getView(atom.workspace)
@@ -198,32 +181,6 @@ describe('CommandPaletteView', () => {
       }
     })
 
-    it('highlights partial matches in the description', async () => {
-      const commandPalette = new CommandPaletteView()
-      await commandPalette.toggle()
-      commandPalette.selectListView.refs.queryEditor.setText('Awesome')
-      await commandPalette.selectListView.update()
-      const {element} = commandPalette.selectListView
-
-      const withDescriptionLi = element.querySelector(`[data-event-name='foo:with-description']`)
-      const matches = withDescriptionLi.querySelectorAll('.character-match')
-      assert(matches.length > 0)
-      assert.equal(matches[0].textContent, 'Awesome')
-    })
-
-    it('highlights partial matches in the tags', async () => {
-      const commandPalette = new CommandPaletteView()
-      await commandPalette.toggle()
-      commandPalette.selectListView.refs.queryEditor.setText('bar')
-      await commandPalette.selectListView.update()
-      const {element} = commandPalette.selectListView
-
-      const withTagsLi = element.querySelector(`[data-event-name='foo:with-tags']`)
-      const matches = withTagsLi.querySelectorAll('.character-match')
-      assert(matches.length > 0)
-      assert.equal(matches[0].textContent, 'bar')
-    })
-
     it('highlights multiple matches in the command name', async () => {
       const commandPalette = new CommandPaletteView()
       await commandPalette.toggle()
@@ -233,6 +190,57 @@ describe('CommandPaletteView', () => {
       assert.equal(matches.length, 2)
       assert.equal(matches[0].textContent, 'Application')
       assert.equal(matches[1].textContent, 'About')
+    })
+
+    describe('in atom >= 1.21, where object command listeners are supported', () => {
+      if (semver.lt(atom.getVersion(), '1.21.0')) {
+        // only function listeners are supported, so the `add` method below will fail
+        return
+      }
+
+      before(() => {
+        atom.commands.add(
+          '*',
+          {
+            'foo:with-description': {
+              displayName: 'A Custom Display Name',
+              description: 'Awesome description here',
+              didDispatch () {}
+            },
+            'foo:with-tags': {
+              displayName: 'A Custom Display Name',
+              tags: ['bar', 'baz'],
+              didDispatch () {}
+            }
+          }
+        )
+      })
+
+      it('highlights partial matches in the description', async () => {
+        const commandPalette = new CommandPaletteView()
+        await commandPalette.toggle()
+        commandPalette.selectListView.refs.queryEditor.setText('Awesome')
+        await commandPalette.selectListView.update()
+        const {element} = commandPalette.selectListView
+
+        const withDescriptionLi = element.querySelector(`[data-event-name='foo:with-description']`)
+        const matches = withDescriptionLi.querySelectorAll('.character-match')
+        assert(matches.length > 0)
+        assert.equal(matches[0].textContent, 'Awesome')
+      })
+
+      it('highlights partial matches in the tags', async () => {
+        const commandPalette = new CommandPaletteView()
+        await commandPalette.toggle()
+        commandPalette.selectListView.refs.queryEditor.setText('bar')
+        await commandPalette.selectListView.update()
+        const {element} = commandPalette.selectListView
+
+        const withTagsLi = element.querySelector(`[data-event-name='foo:with-tags']`)
+        const matches = withTagsLi.querySelectorAll('.character-match')
+        assert(matches.length > 0)
+        assert.equal(matches[0].textContent, 'bar')
+      })
     })
   })
 })

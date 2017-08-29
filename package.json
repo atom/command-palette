@@ -23,6 +23,7 @@
   "devDependencies": {
     "atom-mocha-test-runner": "^0.3.0",
     "coffeelint": "^1.9.7",
+    "semver": "^5.4.1",
     "sinon": "^3.2.1"
   },
   "configSchema": {
