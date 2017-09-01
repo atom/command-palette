@@ -1,18 +1,24 @@
 /** @babel */
 
-import assert from 'assert'
 import _ from 'underscore-plus'
+import assert from 'assert'
+import semver from 'semver'
+import sinon from 'sinon'
 import CommandPaletteView from '../lib/command-palette-view'
 
 describe('CommandPaletteView', () => {
+  let sandbox
   let workspaceElement
 
   beforeEach(() => {
     workspaceElement = atom.views.getView(atom.workspace)
     document.body.appendChild(workspaceElement)
+    document.body.focus()
+    sandbox = sinon.sandbox.create()
   })
 
   afterEach(() => {
+    sandbox.restore()
     workspaceElement.remove()
   })
 
@@ -21,13 +27,29 @@ describe('CommandPaletteView', () => {
       it('shows a list of all valid command descriptions, names, and keybindings for the previously focused element', async () => {
         const editor = await atom.workspace.open()
         editor.element.focus()
+
         const commandPalette = new CommandPaletteView()
         await commandPalette.toggle()
+
         const keyBindings = atom.keymaps.findKeyBindings({target: editor.element})
-        for (const {name, displayName} of atom.commands.findCommands({target: editor.element})) {
+        for (const item of atom.commands.findCommands({target: editor.element})) {
+          const {name, description, displayName, tags} = item
           const eventLi = workspaceElement.querySelector(`[data-event-name='${name}']`)
-          assert.equal(eventLi.querySelector('span').textContent, displayName)
-          assert.equal(eventLi.querySelector('span').title, name)
+          const displayNameLine = eventLi.querySelector('.primary-line')
+          assert.equal(displayNameLine.textContent, displayName)
+          assert.equal(displayNameLine.title, name)
+
+          if (description) {
+            // just in case it's not the first, need to select the item in order
+            // for its description to show
+            await commandPalette.selectListView.selectItem(item)
+
+            const descriptionEl = eventLi.querySelector('.secondary-line div')
+            assert(descriptionEl)
+            assert.equal(descriptionEl.textContent, description)
+            assert.equal(descriptionEl.title, description)
+          }
+
           for (const binding of keyBindings) {
             if (binding.command === name) {
               assert(eventLi.textContent.includes(_.humanizeKeystroke(binding.keystrokes)))
@@ -39,39 +61,29 @@ describe('CommandPaletteView', () => {
 
     describe('when no element has focus', () => {
       it('uses the root view as the element to display and dispatch events to', async () => {
+        const findCommandsSpy = sandbox.spy(atom.commands, 'findCommands')
+        const findKeyBindingsSpy = sandbox.spy(atom.keymaps, 'findKeyBindings')
+
         document.activeElement.blur()
         const commandPalette = new CommandPaletteView()
         await commandPalette.toggle()
-        const keyBindings = atom.keymaps.findKeyBindings({target: workspaceElement})
-        for (const {name, displayName} of atom.commands.findCommands({target: workspaceElement})) {
-          const eventLi = workspaceElement.querySelector(`[data-event-name='${name}']`)
-          assert.equal(eventLi.querySelector('span').textContent, displayName)
-          assert.equal(eventLi.querySelector('span').title, name)
-          for (const binding of keyBindings) {
-            if (binding.command === name) {
-              assert(eventLi.textContent.includes(_.humanizeKeystroke(binding.keystrokes)))
-            }
-          }
-        }
+
+        assert(findCommandsSpy.calledWith({target: workspaceElement}))
+        assert(findKeyBindingsSpy.calledWith({target: workspaceElement}))
       })
     })
 
     describe('when document.body has focus', () => {
       it('uses the root view as the element to display and dispatch events to', async () => {
+        const findCommandsSpy = sandbox.spy(atom.commands, 'findCommands')
+        const findKeyBindingsSpy = sandbox.spy(atom.keymaps, 'findKeyBindings')
+
         document.body.focus()
         const commandPalette = new CommandPaletteView()
         await commandPalette.toggle()
-        const keyBindings = atom.keymaps.findKeyBindings({target: workspaceElement})
-        for (const {name, displayName} of atom.commands.findCommands({target: workspaceElement})) {
-          const eventLi = workspaceElement.querySelector(`[data-event-name='${name}']`)
-          assert.equal(eventLi.querySelector('span').textContent, displayName)
-          assert.equal(eventLi.querySelector('span').title, name)
-          for (const binding of keyBindings) {
-            if (binding.command === name) {
-              assert(eventLi.textContent.includes(_.humanizeKeystroke(binding.keystrokes)))
-            }
-          }
-        }
+
+        assert(findCommandsSpy.calledWith({target: workspaceElement}))
+        assert(findKeyBindingsSpy.calledWith({target: workspaceElement}))
       })
     })
 
@@ -113,8 +125,8 @@ describe('CommandPaletteView', () => {
       assert.notEqual(document.activeElement.closest('atom-text-editor'), editor.element)
       assert.notEqual(commandPalette.selectListView.element.offsetHeight, 0)
       await commandPalette.toggle()
-      assert.equal(document.activeElement.closest('atom-text-editor'), editor.element)
       assert.equal(commandPalette.selectListView.element.offsetHeight, 0)
+      assert.equal(document.activeElement.closest('atom-text-editor'), editor.element)
       await commandPalette.toggle()
       assert.notEqual(document.activeElement.closest('atom-text-editor'), editor.element)
       assert.notEqual(commandPalette.selectListView.element.offsetHeight, 0)
@@ -147,7 +159,7 @@ describe('CommandPaletteView', () => {
   })
 
   describe('match highlighting', () => {
-    it("highlights exact matches", async () => {
+    it('highlights exact matches', async () => {
       const commandPalette = new CommandPaletteView()
       await commandPalette.toggle()
       commandPalette.selectListView.refs.queryEditor.setText('Application: About')
@@ -157,7 +169,7 @@ describe('CommandPaletteView', () => {
       assert.equal(matches[0].textContent, 'Application: About')
     })
 
-    it("highlights partial matches", async () => {
+    it('highlights partial matches in the displayName', async () => {
       const commandPalette = new CommandPaletteView()
       await commandPalette.toggle()
       commandPalette.selectListView.refs.queryEditor.setText('Application')
@@ -169,7 +181,7 @@ describe('CommandPaletteView', () => {
       }
     })
 
-    it("highlights multiple matches in the command name", async () => {
+    it('highlights multiple matches in the command name', async () => {
       const commandPalette = new CommandPaletteView()
       await commandPalette.toggle()
       commandPalette.selectListView.refs.queryEditor.setText('ApplicationAbout')
@@ -178,6 +190,57 @@ describe('CommandPaletteView', () => {
       assert.equal(matches.length, 2)
       assert.equal(matches[0].textContent, 'Application')
       assert.equal(matches[1].textContent, 'About')
+    })
+
+    describe('in atom >= 1.21, where object command listeners are supported', () => {
+      if (semver.lt(atom.getVersion(), '1.21.0')) {
+        // only function listeners are supported, so the `add` method below will fail
+        return
+      }
+
+      before(() => {
+        atom.commands.add(
+          '*',
+          {
+            'foo:with-description': {
+              displayName: 'A Custom Display Name',
+              description: 'Awesome description here',
+              didDispatch () {}
+            },
+            'foo:with-tags': {
+              displayName: 'A Custom Display Name',
+              tags: ['bar', 'baz'],
+              didDispatch () {}
+            }
+          }
+        )
+      })
+
+      it('highlights partial matches in the description', async () => {
+        const commandPalette = new CommandPaletteView()
+        await commandPalette.toggle()
+        commandPalette.selectListView.refs.queryEditor.setText('Awesome')
+        await commandPalette.selectListView.update()
+        const {element} = commandPalette.selectListView
+
+        const withDescriptionLi = element.querySelector(`[data-event-name='foo:with-description']`)
+        const matches = withDescriptionLi.querySelectorAll('.character-match')
+        assert(matches.length > 0)
+        assert.equal(matches[0].textContent, 'Awesome')
+      })
+
+      it('highlights partial matches in the tags', async () => {
+        const commandPalette = new CommandPaletteView()
+        await commandPalette.toggle()
+        commandPalette.selectListView.refs.queryEditor.setText('bar')
+        await commandPalette.selectListView.update()
+        const {element} = commandPalette.selectListView
+
+        const withTagsLi = element.querySelector(`[data-event-name='foo:with-tags']`)
+        const matches = withTagsLi.querySelectorAll('.character-match')
+        assert(matches.length > 0)
+        assert.equal(matches[0].textContent, 'bar')
+      })
     })
   })
 })
