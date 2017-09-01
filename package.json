@@ -1,6 +1,6 @@
 {
   "name": "command-palette",
-  "version": "0.40.4",
+  "version": "0.41.0",
   "main": "./lib/command-palette-package",
   "description": "Find and run available commands using `cmd-shift-p` (macOS) or `ctrl-shift-p` (Linux/Windows).",
   "activationCommands": {
