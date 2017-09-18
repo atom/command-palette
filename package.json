@@ -36,6 +36,16 @@
       "type": "boolean",
       "default": false,
       "description": "Preserve the last search when reopening the command palette."
+    },
+    "historyCommands": {
+      "type": "boolean",
+      "default": false,
+      "description": "Keep command history"
+    },
+    "maxHistoryCommands": {
+      "type": "integer",
+      "default": 10,
+      "description": "Number of history command show on select-list"
     }
   }
 }
