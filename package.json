@@ -26,6 +26,9 @@
     "semver": "^5.4.1",
     "sinon": "^3.2.1"
   },
+  "deserializers": {
+    "commandPalettePackage": "deserialize"
+  },
   "configSchema": {
     "useAlternateScoring": {
       "type": "boolean",
@@ -36,6 +39,11 @@
       "type": "boolean",
       "default": false,
       "description": "Preserve the last search when reopening the command palette."
+    },
+    "preserveMostUsed": {
+      "type": "boolean",
+      "default": true,
+      "description": "Show most used commands when opening the command palette."
     }
   }
 }
