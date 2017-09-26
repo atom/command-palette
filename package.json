@@ -40,10 +40,14 @@
       "default": false,
       "description": "Preserve the last search when reopening the command palette."
     },
-    "preserveMostUsed": {
-      "type": "boolean",
-      "default": true,
-      "description": "Show most used commands when opening the command palette."
+    "initialOrderingOfItems": {
+      "type": "string",
+      "default": "frequency",
+      "enum": [
+        {"value": "frequency", "description": "By frequency of use"},
+        {"value": "recent", "description": "By most recently used"}
+      ]
+
     }
   }
 }
