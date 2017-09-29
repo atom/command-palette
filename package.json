@@ -26,9 +26,6 @@
     "semver": "^5.4.1",
     "sinon": "^3.2.1"
   },
-  "deserializers": {
-    "commandPalettePackage": "deserialize"
-  },
   "configSchema": {
     "useAlternateScoring": {
       "type": "boolean",
@@ -45,7 +42,8 @@
       "default": "frequency",
       "enum": [
         {"value": "frequency", "description": "By frequency of use"},
-        {"value": "recent", "description": "By most recently used"}
+        {"value": "recent", "description": "By most recently used"},
+        {"value": "alphabetic", "description": "Alphabetical order"}
       ]
 
     }

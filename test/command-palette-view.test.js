@@ -22,6 +22,112 @@ describe('CommandPaletteView', () => {
     workspaceElement.remove()
   })
 
+  describe('initial sorting', () => {
+    const fakeCommands = [
+      "first",
+      "one",
+      "two",
+      "three",
+      "four",
+      "five",
+      "six",
+      "seven",
+      "last"
+    ].map(e => `command-palette:${e}`)
+
+    describe('when initially sorting by frequency', () => {
+      let commandPalette
+
+      beforeEach(async () => {
+        commandPalette = new CommandPaletteView()
+        await commandPalette.update({initialOrderingOfItems: 'frequency'})
+        for (let i=0; i<fakeCommands.length; i++) {
+          const command = {
+            name: fakeCommands[i],
+            displayName: fakeCommands[i].replace(/-/g, ' ')
+          }
+          atom.commands.add('atom-workspace', command.name, () => {})
+
+          const numTimesToLaunch = fakeCommands.length - i
+          //console.log(`Launching ${command.displayName} ${numTimesToLaunch} times`)
+
+          for (j=0; j<numTimesToLaunch; j++) {
+            await commandPalette.show()
+            await commandPalette.selectListView.refs.queryEditor.setText(command.displayName)
+            assert.equal(commandPalette.selectListView.getSelectedItem().name, command.name)
+            await commandPalette.selectListView.confirmSelection()
+          }
+        }
+      })
+
+      it('orders the scored items correctly', async () => {
+        await commandPalette.show()
+        await commandPalette.selectListView.refs.queryEditor.setText('')
+        await commandPalette.selectListView.update()
+
+        fakeCommands.forEach(command => {
+          const selectedItem = commandPalette.selectListView.getSelectedItem().name
+          assert.equal(selectedItem, command)
+          commandPalette.selectListView.selectNext()
+        })
+      })
+
+      it('orders the rest of the palette items alphabetically', async () => {
+        await commandPalette.show()
+        await commandPalette.selectListView.refs.queryEditor.setText('')
+        await commandPalette.selectListView.update()
+
+        // skip scored items
+        for(let i=0; i<fakeCommands.length; i++) { commandPalette.selectListView.selectNext() }
+
+        // compare pairwise items
+        let currentItem, previousItem
+        do {
+          previousItem = commandPalette.selectListView.getSelectedItem().name
+          currentItem = commandPalette.selectListView.selectNext().name
+          assert.equal(previousItem.localeCompare(currentItem), -1)
+        }
+        while (currentItem)
+      })
+
+      xit('remembers the ordering between launches', async () => {
+
+      })
+    })
+
+    xdescribe('when initially sorting by recentness', () => {
+      it('has selected the "recent" option in palette settings', async () => {
+
+      })
+
+      it('orders the palette items correctly', async () => {
+
+      })
+
+      it('orders the rest of the palette items alphabetically', async () => {
+
+      })
+
+      it('remembers the ordering between launches', async () => {
+
+      })
+    })
+
+    xdescribe('when initially sorting alphabetically', () => {
+      it('has selected the "alphabetic" option in palette settings', async () => {
+
+      })
+
+      it('orders the palette items correctly', async () => {
+
+      })
+
+      it('remembers the ordering between launches', async () => {
+
+      })
+    })
+  })
+
   describe('toggle', () => {
     describe('when an element is focused', () => {
       it('shows a list of all valid command descriptions, names, and keybindings for the previously focused element', async () => {
