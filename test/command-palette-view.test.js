@@ -79,6 +79,9 @@ describe('CommandPaletteView', () => {
         await commandPalette.selectListView.refs.queryEditor.setText('')
         await commandPalette.selectListView.update()
 
+        commandPalette.selectListView.selectFirst()
+        const firstItem = commandPalette.selectListView.getSelectedItem().name
+
         // skip scored items
         for(let i=0; i<fakeCommands.length; i++) { commandPalette.selectListView.selectNext() }
 
@@ -86,14 +89,28 @@ describe('CommandPaletteView', () => {
         let currentItem, previousItem
         do {
           previousItem = commandPalette.selectListView.getSelectedItem().name
-          currentItem = commandPalette.selectListView.selectNext().name
+          commandPalette.selectListView.selectNext()
+          currentItem = commandPalette.selectListView.getSelectedItem().name
+          if(currentItem == firstItem) break;
           assert.equal(previousItem.localeCompare(currentItem), -1)
         }
-        while (currentItem)
+        while (previousItem != firstItem)
       })
 
-      xit('remembers the ordering between launches', async () => {
+      it('remembers the ordering between launches', async () => {
+        const serializedState = commandPalette.serialize();
+        const newCommandPalette = new CommandPaletteView(serializedState);
 
+        await newCommandPalette.update({initialOrderingOfItems: 'frequency'})
+        await newCommandPalette.show()
+        await newCommandPalette.selectListView.refs.queryEditor.setText('')
+        await newCommandPalette.selectListView.update()
+
+        fakeCommands.forEach(command => {
+          const selectedItem = newCommandPalette.selectListView.getSelectedItem().name
+          assert.equal(selectedItem, command)
+          newCommandPalette.selectListView.selectNext()
+        })
       })
     })
 
@@ -119,6 +136,9 @@ describe('CommandPaletteView', () => {
         await commandPalette.selectListView.refs.queryEditor.setText('')
         await commandPalette.selectListView.update()
 
+        commandPalette.selectListView.selectFirst()
+        const firstItem = commandPalette.selectListView.getSelectedItem().name
+
         // skip scored items
         for(let i=0; i<fakeCommands.length; i++) { commandPalette.selectListView.selectNext() }
 
@@ -126,14 +146,28 @@ describe('CommandPaletteView', () => {
         let currentItem, previousItem
         do {
           previousItem = commandPalette.selectListView.getSelectedItem().name
-          currentItem = commandPalette.selectListView.selectNext().name
+          commandPalette.selectListView.selectNext()
+          currentItem = commandPalette.selectListView.getSelectedItem().name
+          if(currentItem == firstItem) break;
           assert.equal(previousItem.localeCompare(currentItem), -1)
         }
-        while (currentItem)
+        while (previousItem != firstItem)
       })
 
       it('remembers the ordering between launches', async () => {
+        const serializedState = commandPalette.serialize();
+        const newCommandPalette = new CommandPaletteView(serializedState);
 
+        await newCommandPalette.update({initialOrderingOfItems: 'recent'})
+        await newCommandPalette.show()
+        await newCommandPalette.selectListView.refs.queryEditor.setText('')
+        await newCommandPalette.selectListView.update()
+
+        fakeCommands.reverse().forEach(command => {
+          const selectedItem = newCommandPalette.selectListView.getSelectedItem().name
+          assert.equal(selectedItem, command)
+          newCommandPalette.selectListView.selectNext()
+        })
       })
     })
 
@@ -147,18 +181,43 @@ describe('CommandPaletteView', () => {
         await commandPalette.selectListView.refs.queryEditor.setText('')
         await commandPalette.selectListView.update()
 
+        commandPalette.selectListView.selectFirst()
+        const firstItem = commandPalette.selectListView.getSelectedItem().name
+
         // compare pairwise items
         let currentItem, previousItem
         do {
           previousItem = commandPalette.selectListView.getSelectedItem().name
-          currentItem = commandPalette.selectListView.selectNext().name
+          commandPalette.selectListView.selectNext()
+          currentItem = commandPalette.selectListView.getSelectedItem().name
+          if(currentItem == firstItem) break;
           assert.equal(previousItem.localeCompare(currentItem), -1)
         }
-        while (currentItem)
+        while (previousItem != firstItem)
       })
 
-      xit('remembers the ordering between launches', async () => {
+      it('remembers the ordering between launches', async () => {
+        const serializedState = commandPalette.serialize();
+        const newCommandPalette = new CommandPaletteView(serializedState);
 
+        await newCommandPalette.update({initialOrderingOfItems: 'recent'})
+        await newCommandPalette.show()
+        await newCommandPalette.selectListView.refs.queryEditor.setText('')
+        await newCommandPalette.selectListView.update()
+
+        commandPalette.selectListView.selectFirst()
+        const firstItem = commandPalette.selectListView.getSelectedItem().name
+
+        // compare pairwise items
+        let currentItem, previousItem
+        do {
+          previousItem = commandPalette.selectListView.getSelectedItem().name
+          commandPalette.selectListView.selectNext()
+          currentItem = commandPalette.selectListView.getSelectedItem().name
+          if(currentItem == firstItem) break;
+          assert.equal(previousItem.localeCompare(currentItem), -1)
+        }
+        while (previousItem != firstItem)
       })
     })
   })
