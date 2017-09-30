@@ -25,16 +25,10 @@ describe('CommandPaletteView', () => {
   describe('initial sorting', () => {
     let commandPalette
     const fakeCommands = [
-      "first",
-      "one",
-      "two",
-      "three",
-      "four",
-      "five",
-      "six",
-      "seven",
-      "last"
-    ].map(e => `command-palette:${e}`)
+      'one',
+      'two',
+      'three',
+    ].map(command => `command-palette-test:${command}`)
 
     beforeEach(async () => {
       commandPalette = new CommandPaletteView()
