@@ -115,6 +115,28 @@ describe('CommandPaletteView', () => {
       await commandPalette.toggle()
       assert.equal(commandPalette.selectListView.refs.queryEditor.getText(), 'abc')
     })
+    
+    it('hides commands that are prefixed with namespace-names set in `hideNamespaces`', async () => {
+      const editor = await atom.workspace.open()
+      editor.element.focus()
+
+      const commandPalette = new CommandPaletteView()
+      await commandPalette.update({hideNamespaces: ' Core , Editor '})
+      
+      assert.deepEqual(commandPalette.hideNamespaces, ['core', 'editor'])
+      
+      await commandPalette.toggle()
+
+      const items = Array.from(commandPalette.selectListView.refs.items.children)
+        
+      for (const item of items) {
+        const dataEventName = item.getAttribute('data-event-name')
+        const namespace = dataEventName.split(':')[0]
+        
+        assert.notEqual(namespace, 'core')
+        assert.notEqual(namespace, 'editor')
+      }
+    })
 
     it('hides the command palette and focuses the previously active element if the palette was already open', async () => {
       const editor = await atom.workspace.open()
