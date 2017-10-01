@@ -36,6 +36,11 @@
       "type": "boolean",
       "default": false,
       "description": "Preserve the last search when reopening the command palette."
+    },
+    "hideNamespaces": {
+      "type": "string",
+      "default": "",
+      "description": "Comma-seperated list of namespaces (e.g. 'core') for which commands will not be shown. (useful for performance reasons)"
     }
   }
 }
