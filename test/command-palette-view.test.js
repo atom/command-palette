@@ -5,6 +5,7 @@ import assert from 'assert'
 import semver from 'semver'
 import sinon from 'sinon'
 import CommandPaletteView from '../lib/command-palette-view'
+import {CompositeDisposable} from 'event-kit'
 
 describe('CommandPaletteView', () => {
   let sandbox
@@ -198,25 +199,22 @@ describe('CommandPaletteView', () => {
         return
       }
 
-      before(() => {
-        atom.commands.add(
-          '*',
-          {
-            'foo:with-description': {
-              displayName: 'A Custom Display Name',
-              description: 'Awesome description here',
-              didDispatch () {}
-            },
-            'foo:with-tags': {
-              displayName: 'A Custom Display Name',
-              tags: ['bar', 'baz'],
-              didDispatch () {}
-            }
-          }
-        )
+      let disposable
+      beforeEach(() => {
+        disposable = new CompositeDisposable()
+      })
+
+      afterEach(() => {
+        disposable.dispose()
       })
 
       it('highlights partial matches in the description', async () => {
+        disposable.add(atom.commands.add('*', 'foo:with-description', {
+          displayName: 'A Custom Display Name',
+          description: 'Awesome description here',
+          didDispatch () {}
+        }))
+
         const commandPalette = new CommandPaletteView()
         await commandPalette.toggle()
         commandPalette.selectListView.refs.queryEditor.setText('Awesome')
@@ -230,6 +228,12 @@ describe('CommandPaletteView', () => {
       })
 
       it('highlights partial matches in the tags', async () => {
+        disposable.add(atom.commands.add('*', 'foo:with-tags', {
+          displayName: 'A Custom Display Name',
+          tags: ['bar', 'baz'],
+          didDispatch () {}
+        }))
+
         const commandPalette = new CommandPaletteView()
         await commandPalette.toggle()
         commandPalette.selectListView.refs.queryEditor.setText('bar')
@@ -240,6 +244,22 @@ describe('CommandPaletteView', () => {
         const matches = withTagsLi.querySelectorAll('.character-match')
         assert(matches.length > 0)
         assert.equal(matches[0].textContent, 'bar')
+      })
+
+      it ('doesn\'t show results that are marked `hiddenInCommandPalette`', async () => {
+        disposable.add(atom.commands.add('*', 'foo:hidden-in-command-palette', {
+          hiddenInCommandPalette: true,
+          didDispatch () {}
+        }))
+
+        const commandPalette = new CommandPaletteView()
+        await commandPalette.toggle()
+        commandPalette.selectListView.refs.queryEditor.setText('hidden in command palette')
+        await commandPalette.selectListView.update()
+        const {element} = commandPalette.selectListView
+
+        const li = element.querySelector(`[data-event-name='foo:hidden-in-command-palette']`)
+        assert(li == null)
       })
     })
   })
