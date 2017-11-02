@@ -137,6 +137,24 @@ describe('CommandPaletteView', () => {
     })
   })
 
+  describe('hidden commands', () => {
+    it('does not show commands that are marked as `hiddenInCommandPalette` by default, then *only* shows those commands when showHiddenCommands is invoked', async () => {
+      const commandsDisposable = atom.commands.add('*', 'foo:hidden-in-command-palette', {
+        hiddenInCommandPalette: true,
+        didDispatch () {}
+      })
+
+      const commandPalette = new CommandPaletteView()
+      await commandPalette.toggle()
+
+      assert(!commandPalette.selectListView.props.items.find(item => item.name === 'foo:hidden-in-command-palette'))
+
+      await commandPalette.show(true)
+      assert.equal(commandPalette.selectListView.props.items.length, 1)
+      assert.equal(commandPalette.selectListView.props.items[0].name, 'foo:hidden-in-command-palette')
+    })
+  })
+
   describe('when selecting a command', () => {
     it('hides the palette, then focuses the previously focused element and dispatches the selected command on it', async () => {
       const editor = await atom.workspace.open()
@@ -244,22 +262,6 @@ describe('CommandPaletteView', () => {
         const matches = withTagsLi.querySelectorAll('.character-match')
         assert(matches.length > 0)
         assert.equal(matches[0].textContent, 'bar')
-      })
-
-      it ('doesn\'t show results that are marked `hiddenInCommandPalette`', async () => {
-        disposable.add(atom.commands.add('*', 'foo:hidden-in-command-palette', {
-          hiddenInCommandPalette: true,
-          didDispatch () {}
-        }))
-
-        const commandPalette = new CommandPaletteView()
-        await commandPalette.toggle()
-        commandPalette.selectListView.refs.queryEditor.setText('hidden in command palette')
-        await commandPalette.selectListView.update()
-        const {element} = commandPalette.selectListView
-
-        const li = element.querySelector(`[data-event-name='foo:hidden-in-command-palette']`)
-        assert(li == null)
       })
     })
   })
