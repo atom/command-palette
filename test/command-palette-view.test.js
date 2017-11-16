@@ -137,6 +137,43 @@ describe('CommandPaletteView', () => {
     })
   })
 
+  describe('element caching', () => {
+    it('caches all items when the query is changed', async () => {
+      const commandPalette = new CommandPaletteView()
+      const spy = sinon.spy(commandPalette.selectListView.props, 'elementForItem')
+      await commandPalette.toggle()
+      commandPalette.selectListView.items.forEach(item => {
+        const selected = commandPalette.selectListView.getSelectedItem() === item
+        assert(spy.calledWithMatch(item))
+        assert(commandPalette.elementCache.has(item))
+        assert(commandPalette.elementCache.get(item).has(`:${selected}`))
+        assert(spy.returned(commandPalette.elementCache.get(item).get(`:${selected}`)))
+      })
+
+      spy.reset()
+      await commandPalette.selectListView.update({query: 'Z'})
+      commandPalette.selectListView.items.forEach(item => {
+        const selected = commandPalette.selectListView.getSelectedItem() === item
+        assert(spy.calledWithMatch(item))
+        assert(commandPalette.elementCache.has(item))
+        assert(commandPalette.elementCache.get(item).has(`Z:${selected}`))
+        assert(spy.returned(commandPalette.elementCache.get(item).get(`Z:${selected}`)))
+      })
+    })
+
+    it('caches items incrementally when state is changed', async () => {
+      const commandPalette = new CommandPaletteView()
+      const spy = sinon.spy(commandPalette.selectListView.props, 'elementForItem')
+      await commandPalette.toggle()
+      commandPalette.selectListView.selectIndex((commandPalette.selectListView.selectionIndex + 1), false)
+      const selectedItem = commandPalette.selectListView.getSelectedItem()
+      assert(!commandPalette.elementCache.get(selectedItem).has(':true'))
+      await commandPalette.selectListView.update()
+      assert(commandPalette.elementCache.get(selectedItem).has(':true'))
+    })
+  })
+
+
   describe('hidden commands', () => {
     it('does not show commands that are marked as `hiddenInCommandPalette` by default, then *only* shows those commands when showHiddenCommands is invoked', async () => {
       const commandsDisposable = atom.commands.add('*', 'foo:hidden-in-command-palette', {
