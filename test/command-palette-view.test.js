@@ -171,6 +171,36 @@ describe('CommandPaletteView', () => {
       await commandPalette.selectListView.update()
       assert(commandPalette.elementCache.get(selectedItem).has(':true'))
     })
+
+    it('uses cached elements when reactivating', async () => {
+      const commandPalette = new CommandPaletteView()
+      const spy = sinon.spy(commandPalette.selectListView.props, 'elementForItem')
+      await commandPalette.toggle()
+      const originalItemObjects = commandPalette.selectListView.items
+      originalItemObjects.forEach(item => {
+        const selected = commandPalette.selectListView.getSelectedItem() === item
+        assert(spy.calledWithMatch(item))
+        assert(commandPalette.elementCache.has(item))
+        assert(commandPalette.elementCache.get(item).has(`:${selected}`))
+        assert(spy.returned(commandPalette.elementCache.get(item).get(`:${selected}`)))
+      })
+      spy.reset()
+      await commandPalette.toggle()
+      originalItemObjects.forEach(item => {
+        const selected = commandPalette.selectListView.getSelectedItem() === item
+        assert(spy.neverCalledWithMatch(item))
+        assert(commandPalette.elementCache.has(item))
+        assert(commandPalette.elementCache.get(item).has(`:${selected}`))
+      })
+      await commandPalette.toggle()
+      originalItemObjects.forEach(item => {
+        const selected = commandPalette.selectListView.getSelectedItem() === item
+        assert(spy.calledWithMatch(item))
+        assert(commandPalette.elementCache.has(item))
+        assert(commandPalette.elementCache.get(item).has(`:${selected}`))
+        assert(spy.returned(commandPalette.elementCache.get(item).get(`:${selected}`)))
+      })
+    })
   })
 
 
