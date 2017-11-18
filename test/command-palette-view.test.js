@@ -137,7 +137,7 @@ describe('CommandPaletteView', () => {
     })
   })
 
-  describe('element caching', () => {
+  xdescribe('element caching', () => {
     it('caches all items when the query is changed', async () => {
       const commandPalette = new CommandPaletteView()
       const spy = sinon.spy(commandPalette.selectListView.props, 'elementForItem')
