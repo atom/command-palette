@@ -23,6 +23,200 @@ describe('CommandPaletteView', () => {
     workspaceElement.remove()
   })
 
+  describe('initial sorting', () => {
+    let commandPalette
+    const fakeCommands = [
+      'one',
+      'two',
+      'three',
+    ].map(command => `command-palette-test:${command}`)
+
+    beforeEach(async () => {
+      commandPalette = new CommandPaletteView()
+      for (let i=0; i<fakeCommands.length; i++) {
+        const command = {
+          name: fakeCommands[i],
+          displayName: fakeCommands[i].replace(/-/g, ' ')
+        }
+        atom.commands.add('atom-workspace', command.name, () => {})
+
+        const numTimesToLaunch = fakeCommands.length - i
+        //console.log(`Launching ${command.displayName} ${numTimesToLaunch} times`)
+
+        for (j=0; j<numTimesToLaunch; j++) {
+          await commandPalette.show()
+          await commandPalette.selectListView.refs.queryEditor.setText(command.displayName)
+          assert.equal(commandPalette.selectListView.getSelectedItem().name, command.name)
+          await commandPalette.selectListView.confirmSelection()
+        }
+      }
+    })
+
+    describe('when initially sorting by frequency', () => {
+      beforeEach(async () => {
+        await commandPalette.update({initialOrderingOfItems: 'frequency'})
+      })
+
+      it('orders the scored items correctly', async () => {
+        await commandPalette.show()
+        await commandPalette.selectListView.refs.queryEditor.setText('')
+        await commandPalette.selectListView.update()
+
+        fakeCommands.forEach(command => {
+          const selectedItem = commandPalette.selectListView.getSelectedItem().name
+          assert.equal(selectedItem, command)
+          commandPalette.selectListView.selectNext()
+        })
+      })
+
+      it('orders the rest of the palette items alphabetically', async () => {
+        await commandPalette.show()
+        await commandPalette.selectListView.refs.queryEditor.setText('')
+        await commandPalette.selectListView.update()
+
+        commandPalette.selectListView.selectFirst()
+        const firstItem = commandPalette.selectListView.getSelectedItem().name
+
+        // skip scored items
+        for(let i=0; i<fakeCommands.length; i++) { commandPalette.selectListView.selectNext() }
+
+        // compare pairwise items
+        let currentItem, previousItem
+        do {
+          previousItem = commandPalette.selectListView.getSelectedItem().name
+          commandPalette.selectListView.selectNext()
+          currentItem = commandPalette.selectListView.getSelectedItem().name
+          if(currentItem == firstItem) break;
+          assert.equal(previousItem.localeCompare(currentItem), -1)
+        }
+        while (previousItem != firstItem)
+      })
+
+      it('remembers the ordering between launches', async () => {
+        const serializedState = commandPalette.serialize();
+        const newCommandPalette = new CommandPaletteView(serializedState);
+
+        await newCommandPalette.update({initialOrderingOfItems: 'frequency'})
+        await newCommandPalette.show()
+        await newCommandPalette.selectListView.refs.queryEditor.setText('')
+        await newCommandPalette.selectListView.update()
+
+        fakeCommands.forEach(command => {
+          const selectedItem = newCommandPalette.selectListView.getSelectedItem().name
+          assert.equal(selectedItem, command)
+          newCommandPalette.selectListView.selectNext()
+        })
+      })
+    })
+
+    describe('when initially sorting by recentness', () => {
+      beforeEach(async () => {
+        await commandPalette.update({initialOrderingOfItems: 'recent'})
+      })
+
+      it('orders the scored items correctly', async () => {
+        await commandPalette.show()
+        await commandPalette.selectListView.refs.queryEditor.setText('')
+        await commandPalette.selectListView.update()
+
+        fakeCommands.reverse().forEach(command => {
+          const selectedItem = commandPalette.selectListView.getSelectedItem().name
+          assert.equal(selectedItem, command)
+          commandPalette.selectListView.selectNext()
+        })
+      })
+
+      it('orders the rest of the palette items alphabetically', async () => {
+        await commandPalette.show()
+        await commandPalette.selectListView.refs.queryEditor.setText('')
+        await commandPalette.selectListView.update()
+
+        commandPalette.selectListView.selectFirst()
+        const firstItem = commandPalette.selectListView.getSelectedItem().name
+
+        // skip scored items
+        for(let i=0; i<fakeCommands.length; i++) { commandPalette.selectListView.selectNext() }
+
+        // compare pairwise items
+        let currentItem, previousItem
+        do {
+          previousItem = commandPalette.selectListView.getSelectedItem().name
+          commandPalette.selectListView.selectNext()
+          currentItem = commandPalette.selectListView.getSelectedItem().name
+          if(currentItem == firstItem) break;
+          assert.equal(previousItem.localeCompare(currentItem), -1)
+        }
+        while (previousItem != firstItem)
+      })
+
+      it('remembers the ordering between launches', async () => {
+        const serializedState = commandPalette.serialize();
+        const newCommandPalette = new CommandPaletteView(serializedState);
+
+        await newCommandPalette.update({initialOrderingOfItems: 'recent'})
+        await newCommandPalette.show()
+        await newCommandPalette.selectListView.refs.queryEditor.setText('')
+        await newCommandPalette.selectListView.update()
+
+        fakeCommands.reverse().forEach(command => {
+          const selectedItem = newCommandPalette.selectListView.getSelectedItem().name
+          assert.equal(selectedItem, command)
+          newCommandPalette.selectListView.selectNext()
+        })
+      })
+    })
+
+    describe('when initially sorting alphabetically', () => {
+      beforeEach(async () => {
+        await commandPalette.update({initialOrderingOfItems: 'alphabetic'})
+      })
+
+      it('orders the palette items correctly', async () => {
+        await commandPalette.show()
+        await commandPalette.selectListView.refs.queryEditor.setText('')
+        await commandPalette.selectListView.update()
+
+        commandPalette.selectListView.selectFirst()
+        const firstItem = commandPalette.selectListView.getSelectedItem().name
+
+        // compare pairwise items
+        let currentItem, previousItem
+        do {
+          previousItem = commandPalette.selectListView.getSelectedItem().name
+          commandPalette.selectListView.selectNext()
+          currentItem = commandPalette.selectListView.getSelectedItem().name
+          if(currentItem == firstItem) break;
+          assert.equal(previousItem.localeCompare(currentItem), -1)
+        }
+        while (previousItem != firstItem)
+      })
+
+      it('remembers the ordering between launches', async () => {
+        const serializedState = commandPalette.serialize();
+        const newCommandPalette = new CommandPaletteView(serializedState);
+
+        await newCommandPalette.update({initialOrderingOfItems: 'recent'})
+        await newCommandPalette.show()
+        await newCommandPalette.selectListView.refs.queryEditor.setText('')
+        await newCommandPalette.selectListView.update()
+
+        commandPalette.selectListView.selectFirst()
+        const firstItem = commandPalette.selectListView.getSelectedItem().name
+
+        // compare pairwise items
+        let currentItem, previousItem
+        do {
+          previousItem = commandPalette.selectListView.getSelectedItem().name
+          commandPalette.selectListView.selectNext()
+          currentItem = commandPalette.selectListView.getSelectedItem().name
+          if(currentItem == firstItem) break;
+          assert.equal(previousItem.localeCompare(currentItem), -1)
+        }
+        while (previousItem != firstItem)
+      })
+    })
+  })
+
   describe('toggle', () => {
     describe('when an element is focused', () => {
       it('shows a list of all valid command descriptions, names, and keybindings for the previously focused element', async () => {
