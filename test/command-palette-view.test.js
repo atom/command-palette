@@ -29,7 +29,8 @@ describe('CommandPaletteView', () => {
         const editor = await atom.workspace.open()
         editor.element.focus()
 
-        const commandPalette = new CommandPaletteView()
+        // To assert pure item rendering logic, disable render-on-visible behavior by passing Infinity to constructor.
+        const commandPalette = new CommandPaletteView(Infinity)
         await commandPalette.toggle()
 
         const keyBindings = atom.keymaps.findKeyBindings({target: editor.element})
@@ -139,7 +140,7 @@ describe('CommandPaletteView', () => {
 
   describe('element caching', () => {
     it('caches all items when the query is changed', async () => {
-      const commandPalette = new CommandPaletteView()
+      const commandPalette = new CommandPaletteView(Infinity)
       const spy = sinon.spy(commandPalette.selectListView.props, 'elementForItem')
       await commandPalette.toggle()
       commandPalette.selectListView.items.forEach(item => {
@@ -162,7 +163,7 @@ describe('CommandPaletteView', () => {
     })
 
     it('caches items incrementally when state is changed', async () => {
-      const commandPalette = new CommandPaletteView()
+      const commandPalette = new CommandPaletteView(Infinity)
       const spy = sinon.spy(commandPalette.selectListView.props, 'elementForItem')
       await commandPalette.toggle()
       commandPalette.selectListView.selectIndex((commandPalette.selectListView.selectionIndex + 1), false)
@@ -173,7 +174,7 @@ describe('CommandPaletteView', () => {
     })
 
     it('uses cached elements when reactivating', async () => {
-      const commandPalette = new CommandPaletteView()
+      const commandPalette = new CommandPaletteView(Infinity)
       const spy = sinon.spy(commandPalette.selectListView.props, 'elementForItem')
       await commandPalette.toggle()
       const originalItemObjects = commandPalette.selectListView.items
@@ -202,7 +203,6 @@ describe('CommandPaletteView', () => {
       })
     })
   })
-
 
   describe('hidden commands', () => {
     it('does not show commands that are marked as `hiddenInCommandPalette` by default, then *only* shows those commands when showHiddenCommands is invoked', async () => {
@@ -329,6 +329,25 @@ describe('CommandPaletteView', () => {
         const matches = withTagsLi.querySelectorAll('.character-match')
         assert(matches.length > 0)
         assert.equal(matches[0].textContent, 'bar')
+      })
+    })
+  })
+
+  describe('return placeholder element for invisible item for better performance', () => {
+    it('return placeholder element for first 10 items on initial toggle', async () => {
+      const commandPalette = new CommandPaletteView()
+      const spy = sinon.spy(commandPalette.selectListView.props, 'elementForItem')
+      await commandPalette.toggle()
+
+      const initiallyVisibleItemCount = 10
+      assert.equal(spy.args.length, commandPalette.selectListView.items.length)
+      spy.args.forEach((arg, index) => {
+        const innerText = spy.returnValues[index].innerText
+        if (index < initiallyVisibleItemCount) {
+          assert.notEqual(innerText, "")
+        } else {
+          assert.equal(innerText, "")
+        }
       })
     })
   })
