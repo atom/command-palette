@@ -23,3 +23,9 @@
     ]
   }
 ]
+
+'context-menu':
+  '.command-palette .list-group': [
+    {label: 'Copy Display Name', command: 'command-palette:copy-display-name-from-context-menu'}
+    {label: 'Copy Command Name', command: 'command-palette:copy-command-name-from-context-menu'}
+  ]

@@ -29,14 +29,23 @@
   },
   "configSchema": {
     "useAlternateScoring": {
+      "order": 0,
       "type": "boolean",
       "default": true,
       "description": "Use an alternative scoring approach which prefers run of consecutive characters, acronyms and start of words."
     },
     "preserveLastSearch": {
+      "order": 1,
       "type": "boolean",
       "default": false,
       "description": "Preserve the last search when reopening the command palette."
+    },
+    "copySelectedItemTextWhenEmptySelection": {
+      "order": 2,
+      "type": "string",
+      "default": "none",
+      "enum": ["none", "command-name", "display-name"],
+      "description": "Copy selected item's command name or display name by `core:copy`."
     }
   }
 }
