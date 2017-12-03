@@ -15,7 +15,7 @@
   },
   "atomTestRunner": "atom-mocha-test-runner",
   "dependencies": {
-    "atom-select-list": "^0.3.0",
+    "atom-select-list": "^0.7.0",
     "fuzzaldrin": "^2.1.0",
     "fuzzaldrin-plus": "^0.4.1",
     "underscore-plus": "^1.0.0"
