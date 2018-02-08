@@ -37,6 +37,12 @@
       "type": "boolean",
       "default": false,
       "description": "Preserve the last search when reopening the command palette."
+    },
+    "numberOfRecentlyConfirmedCommandsShowsAtTop": {
+      "type": "integer",
+      "default": 0,
+      "minimum": 0,
+      "description": "Specified number of recently confirmed commands appears at top of command list."
     }
   }
 }

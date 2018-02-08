@@ -351,4 +351,125 @@ describe('CommandPaletteView', () => {
       })
     })
   })
+
+  describe('numberOfRecentlyConfirmedCommandsShowsAtTop', () => {
+    let commandPalette, disposable, testCommands
+
+    const selectAndConfirmItem = async (item) => {
+      await commandPalette.selectListView.selectItem(item)
+      const originalDidConfirmSelection = commandPalette.selectListView.props.didConfirmSelection
+      await new Promise(resolve => {
+        const stub = sinon.stub(commandPalette.selectListView.props, "didConfirmSelection").callsFake((...args) => {
+          originalDidConfirmSelection(...args)
+          resolve()
+          stub.restore()
+        })
+        commandPalette.selectListView.confirmSelection()
+      })
+    }
+
+    beforeEach(async () => {
+      commandPalette = new CommandPaletteView()
+      disposable = atom.commands.add('*', {
+        'xxxxx:0': () => {},
+        'xxxxx:1': () => {},
+        'xxxxx:2': () => {},
+        'xxxxx:3': () => {},
+        'xxxxx:4': () => {},
+      })
+      await commandPalette.show()
+      testCommands = commandPalette.selectListView.items.filter(item => item.name.startsWith('xxxxx:'))
+
+      assert.equal(testCommands[0].name, "xxxxx:0")
+      assert.equal(testCommands[1].name, "xxxxx:1")
+      assert.equal(testCommands[2].name, "xxxxx:2")
+      assert.equal(testCommands[3].name, "xxxxx:3")
+      assert.equal(testCommands[4].name, "xxxxx:4")
+      assert.equal(testCommands.length, 5)
+
+      await commandPalette.hide()
+    })
+
+    afterEach(() => {
+      disposable.dispose()
+    })
+
+    it('keep specified nubmer of recentlyConfirmedCommands and show at top', async () => {
+      const withItemElements = fn => fn(Array.from(selectListView.element.querySelectorAll('li')))
+
+      const {selectListView} = commandPalette
+      await commandPalette.update({numberOfRecentlyConfirmedCommandsShowsAtTop: 3})
+
+      await commandPalette.show()
+      await selectAndConfirmItem(testCommands[0])
+      await commandPalette.show()
+      await withItemElements(elements => {
+        assert.equal(elements[0].textContent, testCommands[0].displayName)
+      })
+
+      await selectAndConfirmItem(testCommands[1])
+      await commandPalette.show()
+      await withItemElements(elements => {
+        assert.equal(elements[0].textContent, testCommands[1].displayName)
+        assert.equal(elements[1].textContent, testCommands[0].displayName)
+      })
+
+      await selectAndConfirmItem(testCommands[2])
+      await commandPalette.show()
+      await withItemElements(elements => {
+        assert.equal(elements[0].textContent, testCommands[2].displayName)
+        assert.equal(elements[1].textContent, testCommands[1].displayName)
+        assert.equal(elements[2].textContent, testCommands[0].displayName)
+      })
+
+      await selectAndConfirmItem(testCommands[3])
+      await commandPalette.show()
+      await withItemElements(elements => {
+        assert.equal(elements[0].textContent, testCommands[3].displayName)
+        assert.equal(elements[1].textContent, testCommands[2].displayName)
+        assert.equal(elements[2].textContent, testCommands[1].displayName)
+        assert.notEqual(elements[3].textContent, testCommands[0].displayName)
+      })
+
+      await selectAndConfirmItem(testCommands[2])
+      await commandPalette.show()
+      await withItemElements(elements => {
+        assert.equal(elements[0].textContent, testCommands[2].displayName)
+        assert.equal(elements[1].textContent, testCommands[3].displayName)
+        assert.equal(elements[2].textContent, testCommands[1].displayName)
+        assert.notEqual(elements[3].textContent, testCommands[0].displayName)
+      })
+
+      commandPalette.selectListView.refs.queryEditor.setText('xxxxx')
+      await commandPalette.selectListView.update()
+      withItemElements(elements => {
+        elements = Array.from(selectListView.element.querySelectorAll('li'))
+        const restElements = elements.slice(3)
+        assert.equal(elements[0].textContent, testCommands[2].displayName)
+        assert.equal(elements[1].textContent, testCommands[3].displayName)
+        assert.equal(elements[2].textContent, testCommands[1].displayName)
+        assert(!restElements.find(element => element.textContent === testCommands[2].displayName))
+        assert(!restElements.find(element => element.textContent === testCommands[3].displayName))
+        assert(!restElements.find(element => element.textContent === testCommands[1].displayName))
+        assert(restElements.find(element => element.textContent === testCommands[0].displayName))
+      })
+    })
+
+    it('immediately update size of recentlyConfirmedCommands', async () => {
+      await commandPalette.update({numberOfRecentlyConfirmedCommandsShowsAtTop: 3})
+
+      await commandPalette.show()
+      await selectAndConfirmItem(testCommands[0])
+      await commandPalette.show()
+      await selectAndConfirmItem(testCommands[1])
+      await commandPalette.show()
+      await selectAndConfirmItem(testCommands[2])
+
+      assert.deepEqual(commandPalette.recentlyConfirmedCommands, [testCommands[2], testCommands[1], testCommands[0]])
+      await commandPalette.update({numberOfRecentlyConfirmedCommandsShowsAtTop: 2})
+      assert.deepEqual(commandPalette.recentlyConfirmedCommands, [testCommands[2], testCommands[1]])
+      await commandPalette.update({numberOfRecentlyConfirmedCommandsShowsAtTop: 0})
+      assert.deepEqual(commandPalette.recentlyConfirmedCommands, [])
+    })
+  })
 })
