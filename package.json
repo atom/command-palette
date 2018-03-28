@@ -40,12 +40,24 @@
       "default": false,
       "description": "Preserve the last search when reopening the command palette."
     },
-    "copySelectedItemTextWhenEmptySelection": {
+    "allowCoreCopyWithEmptySelectionCopySelectedItemText": {
       "order": 2,
       "type": "string",
       "default": "none",
       "enum": ["none", "command-name", "display-name"],
       "description": "Copy selected item's command name or display name by `core:copy`."
+    },
+    "surroundByBacktickWhenCopyCommandName": {
+      "order": 3,
+      "type": "boolean",
+      "default": false,
+      "description": "Automatically surround by backtick when copying command name."
+    },
+    "surroundByBacktickWhenCopyDisplayName": {
+      "order": 4,
+      "type": "boolean",
+      "default": false,
+      "description": "Automatically surround by backtick when copying display name."
     }
   }
 }
