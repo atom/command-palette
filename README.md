@@ -1,5 +1,5 @@
 # Command Palette package
-[![CI](https://github.com/atom/language-sql/actions/workflows/ci.yml/badge.svg)](https://github.com/atom/ide-php/actions/workflows/ci.yml)
+[![CI](https://github.com/atom/command-palette/actions/workflows/ci.yml/badge.svg)](https://github.com/atom/command-palette/actions/workflows/ci.yml)
 
 Find and run available commands using <kbd>cmd-shift-p</kbd> (macOS) or <kbd>ctrl-shift-p</kbd> (Linux/Windows) in Atom.
 
