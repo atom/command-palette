@@ -285,4 +285,115 @@ describe('CommandPaletteView', () => {
       })
     })
   })
+
+  describe('`command-palette:copy-display-name` and `command-palette:copy-command-name`', () => {
+    let spy, commandPalette, selectListView
+
+    beforeEach(async () => {
+      atom.commands.add('*', {
+        'test-xxxxx-command:command-one': () => {},
+        'test-xxxxx-command:command-two': () => {},
+        'test-xxxxx-command:command-three': () => {},
+        'test-xxxxx-command:command-four': () => {},
+        'test-xxxxx-command:command-five': () => {},
+      })
+
+      spy = sandbox.spy(atom.clipboard, 'write')
+      commandPalette = new CommandPaletteView()
+      selectListView = commandPalette.selectListView
+      await commandPalette.toggle()
+      atom.config.set("command-palette.surroundByBacktickWhenCopyCommandName", false)
+      atom.config.set("command-palette.surroundByBacktickWhenCopyDisplayName", false)
+    })
+
+    describe('surroundByBacktickWhenCopyCommandName', () => {
+      it('auto-surround by backtick when copy-command-name', async () => {
+        selectListView.selectItem(selectListView.items.find(item => item.name === "test-xxxxx-command:command-one"))
+        atom.commands.dispatch(selectListView.element, 'command-palette:copy-command-name')
+        assert(spy.calledWith("test-xxxxx-command:command-one"))
+        spy.reset()
+        atom.config.set("command-palette.surroundByBacktickWhenCopyCommandName", true)
+        atom.commands.dispatch(selectListView.element, 'command-palette:copy-command-name')
+        assert(spy.calledWith("`test-xxxxx-command:command-one`"))
+      })
+    })
+    describe('surroundByBacktickWhenCopyDisCommandName', () => {
+      it('auto-surround by backtick when copy-display-name', async () => {
+        selectListView.selectItem(selectListView.items.find(item => item.name === "test-xxxxx-command:command-one"))
+        atom.commands.dispatch(selectListView.element, 'command-palette:copy-display-name')
+        assert(spy.calledWith("Test Xxxxx Command: Command One"))
+        spy.reset()
+        atom.config.set("command-palette.surroundByBacktickWhenCopyDisplayName", true)
+        atom.commands.dispatch(selectListView.element, 'command-palette:copy-display-name')
+        assert(spy.calledWith("`Test Xxxxx Command: Command One`"))
+      })
+    })
+
+    describe('copy by keyboard shortcut', () => {
+      it('copy name for selected item', async () => {
+        selectListView.selectItem(selectListView.items.find(item => item.name === "test-xxxxx-command:command-one"))
+        atom.commands.dispatch(selectListView.element, 'command-palette:copy-display-name')
+        assert(spy.calledWith("Test Xxxxx Command: Command One"))
+        atom.commands.dispatch(selectListView.element, 'command-palette:copy-command-name')
+        assert(spy.calledWith("test-xxxxx-command:command-one"))
+
+        spy.reset()
+        selectListView.selectItem(selectListView.items.find(item => item.name === "test-xxxxx-command:command-two"))
+        atom.commands.dispatch(selectListView.element, 'command-palette:copy-display-name')
+        assert(spy.calledWith("Test Xxxxx Command: Command Two"))
+        atom.commands.dispatch(selectListView.element, 'command-palette:copy-command-name')
+        assert(spy.calledWith("test-xxxxx-command:command-two"))
+      })
+    })
+
+    describe('copy from context menu', () => {
+      it('copy name or displayName of targeted item', async () => {
+        selectListView.refs.queryEditor.setText('xxxxx')
+        await selectListView.update()
+        const elements = Array.from(selectListView.refs.items.children)
+        assert.equal(elements.length, 5)
+
+        const elementOne = selectListView.element.querySelector("[data-event-name='test-xxxxx-command:command-one']")
+        atom.commands.dispatch(elementOne, 'command-palette:copy-display-name-from-context-menu')
+        assert(spy.calledWith("Test Xxxxx Command: Command One"))
+        atom.commands.dispatch(elementOne, 'command-palette:copy-command-name-from-context-menu')
+        assert(spy.calledWith("test-xxxxx-command:command-one"))
+
+        spy.reset()
+        const elementTwo = selectListView.element.querySelector("[data-event-name='test-xxxxx-command:command-two']")
+        atom.commands.dispatch(elementTwo, 'command-palette:copy-display-name-from-context-menu')
+        assert(spy.calledWith("Test Xxxxx Command: Command Two"))
+        atom.commands.dispatch(elementTwo, 'command-palette:copy-command-name-from-context-menu')
+        assert(spy.calledWith("test-xxxxx-command:command-two"))
+      })
+    })
+
+    describe('core:copy behavior with command-palette.allowCoreCopyWithEmptySelectionCopySelectedItemText setting', () => {
+      beforeEach(async () => {
+        selectListView.refs.queryEditor.setText('xxxxx')
+        await selectListView.update()
+        assert.equal(selectListView.getSelectedItem().name, 'test-xxxxx-command:command-one')
+        const elements = Array.from(selectListView.refs.items.children)
+        assert.equal(elements.length, 5)
+      })
+
+      it('[value = "none"]: copy line text', async () => {
+        atom.config.set("command-palette.allowCoreCopyWithEmptySelectionCopySelectedItemText", "none")
+        atom.commands.dispatch(selectListView.refs.queryEditor.element, 'core:copy')
+        assert(spy.calledWith("xxxxx")) // default behavoir of atom-text-editor
+      })
+
+      it('[value = "display-name"]: copy displayName of selected item', async () => {
+        atom.config.set("command-palette.allowCoreCopyWithEmptySelectionCopySelectedItemText", "display-name")
+        atom.commands.dispatch(selectListView.refs.queryEditor.element, 'core:copy')
+        assert(spy.calledWith("Test Xxxxx Command: Command One"))
+      })
+
+      it('[value = "command-name]": copy command name of selected item', async () => {
+        atom.config.set("command-palette.allowCoreCopyWithEmptySelectionCopySelectedItemText", "command-name")
+        atom.commands.dispatch(selectListView.refs.queryEditor.element, 'core:copy')
+        assert(spy.calledWith("test-xxxxx-command:command-one"))
+      })
+    })
+  })
 })
