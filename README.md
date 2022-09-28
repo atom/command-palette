@@ -1,4 +1,5 @@
-# Command Palette package
+##### Atom and all repositories under Atom will be archived on December 15, 2022. Learn more in our [official announcement](https://github.blog/2022-06-08-sunsetting-atom/)
+ # Command Palette package
 [![CI](https://github.com/atom/command-palette/actions/workflows/ci.yml/badge.svg)](https://github.com/atom/command-palette/actions/workflows/ci.yml)
 
 Find and run available commands using <kbd>cmd-shift-p</kbd> (macOS) or <kbd>ctrl-shift-p</kbd> (Linux/Windows) in Atom.
